@@ -1,0 +1,28 @@
+(declare
+	(name "Sprite1")
+	(visible true)
+	(size 200)
+	(x 0)
+	(y 0)
+	(direction 90)
+)
+
+(when (clicked flag)
+	(say (message "hello!"))
+)
+
+(when (pressed space)
+
+)
+
+(when (clicked sprite)
+
+)
+
+(when (loudness 10) 
+
+)
+
+(when (broadcast "message1")
+
+)
