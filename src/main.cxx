@@ -8,8 +8,12 @@
 #include <ZipFile.h>
 #include <bparser/node.hxx>
 #include <bparser/json.hxx>
+#include <bparser/sexpr.hxx>
+
+#include "compiler.hxx"
 
 int main(int argc, char* argv[]) {
+	// Command line parser
 	argh::parser cmdl(argc, argv);
 	// Help if no arguments or help flag
 	if (!cmdl(1) || cmdl[{"-h", "--help"}]) {
@@ -82,6 +86,9 @@ int main(int argc, char* argv[]) {
 		<< "Using Sprite: " << sprite.find("name")[0].value << std::endl;
 	sprite.find("name")[0].value = "edited sprite file";
 
+	// Remove existing code
+	sprite.find("blocks").clear();
+
 	// Compile files
 	if (cmdl.size() <= 2) {
 		std::cout
@@ -97,6 +104,15 @@ int main(int argc, char* argv[]) {
 		if (!file.is_open()) {
 			std::cout
 				<< "Error: Failed to open file! (\"" << filename << "\" not found)" << std::endl;
+			return EXIT_FAILURE;
+		}
+		bparser::node& code = bparser::sexpr::parse(file);
+		file.close();
+		try {
+			compile(sprite, code);
+		}
+		catch (std::exception e) {
+			std::cout << "Compile Error: " << filename << ":" << e.what() << std::endl;
 			return EXIT_FAILURE;
 		}
 	}

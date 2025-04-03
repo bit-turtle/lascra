@@ -7,12 +7,14 @@
 	(direction 90)
 )
 
-(when (clicked flag)
+(when flag
 	(say (message "hello!"))
 )
 
 (when (pressed space)
-
+	(set "myvariable" 6)
+	(if (equal 5 5)
+		(then
 )
 
 (when (clicked sprite)
