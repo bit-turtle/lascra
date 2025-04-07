@@ -28,13 +28,14 @@ void list(bparser::node& sprite, bparser::node& code) {
 	}
 	bparser::node* list = new bparser::node(id::get(code[0].value));
 	list->emplace(code[0].value);
-	bparser::node& arr = list->emplace("");
-	if (code.size() < 2) arr.emplace(" ");
-	if (code.size() < 3) arr.emplace(" ");
+	bparser::node* arr = new bparser::node("");
 	for (int i = 1; i < code.size(); i++) {
-		arr.emplace(code[i].value);
+		arr->emplace(code[i].value);
 	}
+	list->display("  ", "- ");
 	// Add list
+	if (arr->size() == 1) list->emplace("").push(arr);
+	else list->push(arr);
 	sprite.find("lists").push(list);
 }
 

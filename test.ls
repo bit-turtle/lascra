@@ -17,5 +17,6 @@
 		"thing 3"
 	)
 	(list emptylist)
+	(list smollist onething)
 	(variable emptyvariable)
 )

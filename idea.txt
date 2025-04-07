@@ -28,3 +28,12 @@
 (when (broadcast "message1")
 
 )
+
+
+(when flag
+	(set "My Variable" 80)
+	(change "My Variable" 1)
+	(if (equal (variable "My Variable") (value 8))
+		(change "My Variable" 8)
+	)
+)
