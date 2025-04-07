@@ -19,4 +19,11 @@
 	(list emptylist)
 	(list smollist onething)
 	(variable emptyvariable)
+	(broadcast turtlemessage)
+)
+(when flag
+	(say "Hi!")
+)
+(when clicked
+	(say "Bye!")
 )

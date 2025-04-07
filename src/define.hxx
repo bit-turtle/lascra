@@ -4,6 +4,7 @@
 * (define
 *	(variable "my variable" 5)
 *	(list "my list" (1 2 3))
+*	(broadcast "message1")
 * )
 */
 

@@ -6,9 +6,11 @@
 #include <stdexcept>
 
 #include "compiler.hxx"
+#include "error.hxx"
 
 #include "declare.hxx"
 #include "define.hxx"
+#include "when.hxx"
 
 void compile(bparser::node& sprite, bparser::node& code) {
 	for (int i = 0; i < code.size(); i++) {
@@ -17,9 +19,7 @@ void compile(bparser::node& sprite, bparser::node& code) {
 				declare(sprite, code[i]);
 			}
 			catch (std::exception e) {
-				std::ostringstream error;
-				error << i << "[declare]:" << e.what();
-				throw std::runtime_error(error.str());
+				throw error(i, "declare", e);
 			}
 		}
 		else if (code[i].value == "define") {
@@ -27,15 +27,19 @@ void compile(bparser::node& sprite, bparser::node& code) {
 				define(sprite, code[i]);
 			}
 			catch (std::exception e) {
-				std::ostringstream error;
-				error << i << "[define]:" << e.what();
-				throw std::runtime_error(error.str());
+				throw error(i, "define", e);
+			}
+		}
+		else if (code[i].value == "when") {
+			try {
+				when(sprite, code[i]);
+			}
+			catch (std::exception e) {
+				throw error(i, "when", e);
 			}
 		}
 		else {
-			std::ostringstream error;
-			error << i << "[" << code[i].value << "]" << ": " << "Unknown keyword";
-			throw std::runtime_error(error.str());
+			throw error(i, code[i].value, "Unknown Keyword");
 		}
 	}
 }

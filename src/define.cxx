@@ -5,10 +5,11 @@
 #include <stdexcept>
 
 #include "id.hxx"
+#include "error.hxx"
 
 void variable(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 1 && code.size() != 2) {
-		throw std::runtime_error("Wrong number of parameters (Expected 1 or 2)");
+		throw error("Wrong number of parameters (Expected 1 or 2)");
 	}
 	bparser::node* var = new bparser::node(id::get(code[0].value));
 	var->emplace(code[0].value);
@@ -24,7 +25,7 @@ void variable(bparser::node& sprite, bparser::node& code) {
 
 void list(bparser::node& sprite, bparser::node& code) {
 	if (code.size() < 1) {
-		throw std::runtime_error("Wrong number of parameters (Expected at least 1)");
+		throw error("Wrong number of parameters (Expected at least 1)");
 	}
 	bparser::node* list = new bparser::node(id::get(code[0].value));
 	list->emplace(code[0].value);
@@ -38,6 +39,12 @@ void list(bparser::node& sprite, bparser::node& code) {
 	else list->push(arr);
 	sprite.find("lists").push(list);
 }
+void broadcast(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 1) {
+		throw error("Wrong number of parameters (Expected 1)");
+	}
+	sprite.find("broadcasts").emplace(id::get(code[0].value)).emplace(code[0].value);
+}
 
 void define(bparser::node& sprite, bparser::node& code) {
 	for (int i = 0; i < code.size(); i++) {
@@ -46,9 +53,7 @@ void define(bparser::node& sprite, bparser::node& code) {
 				variable(sprite, code[i]);
 			}
 			catch (std::exception e) {
-				std::ostringstream error;
-				error << i << "[variable]:" << e.what();
-				throw std::runtime_error(error.str());
+				throw error(i, "variable", e);
 			}
 		}
 		else if (code[i].value == "list") {
@@ -56,15 +61,19 @@ void define(bparser::node& sprite, bparser::node& code) {
 				list(sprite, code[i]);
 			}
 			catch (std::exception e) {
-				std::ostringstream error;
-				error << i << "[list]:" << e.what();
-				throw std::runtime_error(error.str());
+				throw error(i, "list", e);
+			}
+		}
+		else if (code[i].value == "broadcast") {
+			try {
+				broadcast(sprite, code[i]);
+			}
+			catch (std::exception e) {
+				throw error(i, "broadcast", e);
 			}
 		}
 		else {
-			std::ostringstream error;
-			error << i << "[" << code[i].value << "]" << ": Invalid type (Expected \"variable\" or \"list\")";
-			throw std::runtime_error(error.str());
+			throw error(i, code[i].value, "Invalid type (Expected \"variable\", \"list\", or \"broadcast\")");
 		}
 	}
 }
