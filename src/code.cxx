@@ -10,7 +10,7 @@ std::string say(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 1) throw error("Expected 1 parameter");
 	std::string id = id::get("say");
 	bparser::node& say = block(id, "looks_say", false);
-	say.find("inputs").push(&parameter_string(sprite, code[0])).value = "MESSAGE";
+	say.find("inputs").push(&parameter_string(sprite, code[0], id)).value = "MESSAGE";
 	sprite.find("blocks").push(&say);
 	return id;
 }

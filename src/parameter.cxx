@@ -9,14 +9,7 @@
 
 #include <string>
 
-std::string parameter_block(bparser::node& sprite, bparser::node& code) {
-	if (code.value == "join") {
-
-	}
-	throw error("Not Implemented");
-}
-
-void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node& node) {
+void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node& node, std::string parentid) {
 	// Type
 	if (code.value == "variable") {
 		if (code.size() != 1) throw error("Expected 1 parameter");
@@ -106,13 +99,29 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		}
 		else throw error("Unknown value");
 		value->find("topLevel")[0].value = "false";
+		parent(*value, parentid);
 		sprite.find("blocks").push(value);
 		node.emplace(val);
+	}
+	else if (code.value == "join") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		std::string joinid = id::get("join");
+		bparser::node& join = block(joinid, "operator_join");
+		// Parameters
+		try { join.find("inputs").push(&parameter_string(sprite, code[0], parentid)).value = "STRING1"; }
+		catch (std::exception e) { throw error(0, e); }
+		try { join.find("inputs").push(&parameter_string(sprite, code[1], parentid)).value = "STRING2"; }
+		catch (std::exception e) { throw error(1, e); }
+		// Add join block
+		join.find("topLevel")[0].value = "false";
+		parent(join, parentid);
+		sprite.find("blocks").push(&join);
+		node.emplace(joinid);
 	}
 	else throw error("Unknown type");
 }
 
-bparser::node& parameter_string(bparser::node& sprite, bparser::node& code) {
+bparser::node& parameter_string(bparser::node& sprite, bparser::node& code, std::string parentid) {
 	bparser::node& node = *(new bparser::node(""));
 	// Use value if no subnodes
 	if (code.size() == 0) {
@@ -123,7 +132,7 @@ bparser::node& parameter_string(bparser::node& sprite, bparser::node& code) {
 	}
 	else {
 		node.emplace("3");
-		parameter_generic(sprite, code, node);
+		parameter_generic(sprite, code, node, parentid);
 		// Default
 		bparser::node& hidden = node.emplace("");
 		hidden.emplace("10");

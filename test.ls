@@ -24,6 +24,13 @@
 (when flag
 	(say "Hi!")
 	(say (variable "My Variable"))
+	(say (join "Hello, " "World!"))
+	(say
+		(join
+			"Hello, "
+			(join (variable "My Variable") "!")
+		)
+	)
 )
 (when clicked
 	(say "Bye!")

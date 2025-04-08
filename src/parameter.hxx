@@ -1,7 +1,5 @@
 // lascra parameter system
 
-#include <bparser/node.hxx>
-
 /* Scratch Enums:
  * - Format: [number, params...]
  * - Numbers:
@@ -18,6 +16,8 @@
  *   - 13: List // [13, "ListName", "ListID_2348902"]
 */
 
+#include <bparser/node.hxx>
+#include <string>
+
 // Parameter function, returns a scratch enum
-bparser::node& parameter_string(bparser::node& sprite, bparser::node& code);
-bparser::node& parameter_number(bparser::node& sprite, bparser::node& code);
+bparser::node& parameter_string(bparser::node& sprite, bparser::node& code, std::string parentid);
