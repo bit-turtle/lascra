@@ -29,11 +29,16 @@ void when(bparser::node& sprite, bparser::node& params) {
 	sprite.find("blocks").push(prevblock);
 	// Code in event
 	for (int i = 1; i < params.size(); i++) {
-		std::string id = code(sprite, params[i]);
-		next(*prevblock, id);
-		prevblock = &sprite.find("blocks").find(id);
-		parent(*prevblock, previd);
-		previd = id;
+		try {
+			std::string id = code(sprite, params[i]);
+			next(*prevblock, id);
+			prevblock = &sprite.find("blocks").find(id);
+			parent(*prevblock, previd);
+			previd = id;
+		}
+		catch (std::exception e) {
+			throw error(i-1, e);
+		}
 	}
 	
 }

@@ -23,7 +23,10 @@
 )
 (when flag
 	(say "Hi!")
+	(say (variable "My Variable"))
 )
 (when clicked
 	(say "Bye!")
+	(say (list "My List"))
+	(say (value timer))
 )

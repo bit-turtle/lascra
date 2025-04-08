@@ -1,0 +1,36 @@
+"blocks":{
+	"MzHF;8FhKkBxu.LDbE)=":{	// When flag pressed
+		"opcode":"event_whenflagclicked",
+		"next":"~:0{dazx9)D;|DJX{aWK",
+		"parent":null,
+		"inputs":{},
+		"fields":{},
+		"shadow":false,
+		"topLevel":true,
+		"x":199,
+		"y":247
+	},
+	"~:0{dazx9)D;|DJX{aWK":{	// Say join apple , 5
+		"opcode":"looks_say",
+		"next":null,
+		"parent":"MzHF;8FhKkBxu.LDbE)=",
+		"inputs":{
+			"MESSAGE":[3,"3zg`EI7^O8:L8Yn4wM#-",[10,"Hello!"]]
+		},
+		"fields":{},
+		"shadow":false,
+		"topLevel":false
+	},
+	"3zg`EI7^O8:L8Yn4wM#-":{	// Join
+		"opcode":"operator_join",
+		"next":null,
+		"parent":"~:0{dazx9)D;|DJX{aWK",
+		"inputs":{
+			"STRING1":[1,[10,"apple "]],
+			"STRING2":[1,[10,"5"]]
+		},
+		"fields":{},
+		"shadow":false,
+		"topLevel":false
+	}
+}

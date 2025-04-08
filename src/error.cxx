@@ -7,9 +7,14 @@ std::runtime_error error(std::string error) {
 	return std::runtime_error(error);
 }
 
+std::runtime_error error(int num, std::exception& previous) {
+	std::ostringstream err;
+	err << num << previous.what();
+	return std::runtime_error(err.str());
+}
 std::runtime_error error(std::string error, std::exception& previous) {
 	std::ostringstream err;
-	err << error << previous.what();
+	err << "[" << error << "]:" << previous.what();
 	return std::runtime_error(err.str());
 }
 std::runtime_error error(int num, std::string tag, std::string error) {
