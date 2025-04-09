@@ -38,3 +38,21 @@ bool checknum(std::string& num) {
 	}
 	return true;
 }
+
+// Make sure it is a valid integer
+bool checkint(std::string& num, bool positive) {
+	if (!checknum(num)) return false;
+	std::istringstream nstr(num);
+	char c;
+	while (nstr.get(c)) {
+		switch (c) {
+			case '-':
+				if (positive) return false;
+				break;
+			case '.':
+				return false;
+				break;
+		}
+	}
+	return true;
+}

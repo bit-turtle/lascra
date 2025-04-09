@@ -12,7 +12,7 @@ void variable(bparser::node& sprite, bparser::node& code) {
 		throw error("Wrong number of parameters (Expected 1 or 2)");
 	}
 	bparser::node* var = new bparser::node(id::get(code[0].value));
-	var->emplace(code[0].value);
+	var->emplace(code[0].value).string = true;
 	if (code.size() == 2) {
 		var->emplace(code[1].value);
 	}
@@ -28,7 +28,7 @@ void list(bparser::node& sprite, bparser::node& code) {
 		throw error("Wrong number of parameters (Expected at least 1)");
 	}
 	bparser::node* list = new bparser::node(id::get(code[0].value));
-	list->emplace(code[0].value);
+	list->emplace(code[0].value).string = true;
 	bparser::node* arr = new bparser::node("");
 	for (int i = 1; i < code.size(); i++) {
 		arr->emplace(code[i].value);

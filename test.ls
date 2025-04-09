@@ -22,18 +22,5 @@
 	(broadcast turtlemessage)
 )
 (when flag
-	(say "Hi!")
-	(say (variable "My Variable"))
-	(say (join "Hello, " "World!"))
-	(say
-		(join
-			"Hello, "
-			(join (variable "My Variable") "!")
-		)
-	)
-)
-(when clicked
-	(say "Bye!")
-	(say (list "My List"))
-	(say (value timer))
+	(say (join "The square root of 8 times 5 plus 1 is: " (+ (* (math sqrt 8) 5) 1) ) )
 )

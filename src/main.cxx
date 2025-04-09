@@ -86,10 +86,11 @@ int main(int argc, char* argv[]) {
 		<< "Using Sprite: " << sprite.find("name")[0].value << std::endl;
 	sprite.find("name")[0].value = "edited sprite file";
 
-	// Remove existing code, variables, and lists
+	// Remove existing code, broadcasts, variables, and lists
 	sprite.find("blocks").clear();
 	sprite.find("variables").clear();
 	sprite.find("lists").clear();
+	sprite.find("broadcasts").clear();
 
 	// Compile files
 	if (cmdl.size() <= 2) {

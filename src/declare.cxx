@@ -14,6 +14,7 @@ void declaration(bparser::node& sprite, bparser::node& code) {
 			throw error("Wrong number of parameters (Expected 1)");
 		}
 		sprite.find("name")[0].value = code[0].value;
+		sprite.find("name")[0].string = true;
 	}
 	else if (code.value == "x") {
 		if (code.size() != 1) {

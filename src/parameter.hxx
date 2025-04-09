@@ -21,3 +21,4 @@
 
 // Parameter function, returns a scratch enum
 bparser::node& parameter_string(bparser::node& sprite, bparser::node& code, std::string parentid);
+bparser::node& parameter_number(bparser::node& sprite, bparser::node& code, std::string parentid, bool posint = false);
