@@ -25,6 +25,54 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		list.emplace(code[0].value);
 		list.emplace(find_list(sprite, code[0].value));
 	}
+	else if (code.value == "listlength") {
+		if (code.size() != 1) throw error("Expected 1 parameter");
+		std::string listlengthid = id::get("listlength");
+		bparser::node& listlength = block(listlengthid, "data_lengthoflist");
+		// Process list
+		bparser::node& list = listlength.find("fields").emplace("LIST");
+		list.emplace(code[0].value);
+		list.emplace(find_list(sprite, code[0].value));
+		// Add listlength block
+		listlength.find("topLevel")[0].value = "false";
+		parent(listlength, parentid);
+		sprite.find("blocks").push(&listlength);
+		node.emplace(listlengthid);
+	}
+	else if (code.value == "item") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		std::string itemid = id::get("item");
+		bparser::node& item = block(itemid, "data_itemoflist");
+		try { item.find("inputs").push(&parameter_number(sprite, code[0], itemid, false, true)).value = "INDEX"; }
+		catch (std::exception e) { throw error(0, e); }
+		// Process list
+		bparser::node& list = item.find("fields").emplace("LIST");
+		list.emplace(code[1].value);
+		try { list.emplace(find_list(sprite, code[1].value)); }
+		catch (std::exception e) { throw error(1, e); }
+		// Add item block
+		item.find("topLevel")[0].value = "false";
+		parent(item, parentid);
+		sprite.find("blocks").push(&item);
+		node.emplace(itemid);
+	}
+	else if (code.value == "item#") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		std::string itemid = id::get("item");
+		bparser::node& item = block(itemid, "data_itemnumoflist");
+		try { item.find("inputs").push(&parameter_string(sprite, code[0], itemid)).value = "ITEM"; }
+		catch (std::exception e) { throw error(0, e); }
+		// Process list
+		bparser::node& list = item.find("fields").emplace("LIST");
+		list.emplace(code[1].value);
+		try { list.emplace(find_list(sprite, code[1].value)); }
+		catch (std::exception e) { throw error(1, e); }
+		// Add item block
+		item.find("topLevel")[0].value = "false";
+		parent(item, parentid);
+		sprite.find("blocks").push(&item);
+		node.emplace(itemid);
+	}
 	else if (code.value == "value") {
 		if (code.size() != 1) throw error("Expected 1 parameter");
 		std::string val = "";
@@ -56,6 +104,10 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		else if (code[0].value == "mouse_y") {
 			val = id::get("mousey");
 			value = &block(val, "sensing_mousey");
+		}
+		else if (code[0].value == "answer") {
+			val = id::get("answer");
+			value = &block(val, "sensing_answer");
 		}
 		else if (code[0].value == "loudness") {
 			val = id::get("loudness");
@@ -103,6 +155,105 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		sprite.find("blocks").push(value);
 		node.emplace(val);
 	}
+	else if (code.value == "costume") {
+		if (code.size() != 1) throw error("Expected 1 parameter");
+		std::string costumeid = id::get("costume");
+		bparser::node& costume = block(costumeid, "looks_costumenumbername");
+		// Process parameter
+		bparser::node& numbername = costume.find("fields").emplace("NUMBER_NAME");
+		if (code[0].value == "number") numbername.emplace("number");
+		else if (code[0].value == "name") numbername.emplace("name");
+		else throw error("Expected \"number\" or \"name\"");
+		numbername.emplace("null");
+		// Add length block
+		costume.find("topLevel")[0].value = "false";
+		parent(costume, parentid);
+		sprite.find("blocks").push(&costume);
+		node.emplace(costumeid);
+	}
+	else if (code.value == "backdrop") {
+		if (code.size() != 1) throw error("Expected 1 parameter");
+		std::string backdropid = id::get("backdrop");
+		bparser::node& backdrop = block(backdropid, "looks_backdropnumbername");
+		// Process parameter
+		bparser::node& numbername = backdrop.find("fields").emplace("NUMBER_NAME");
+		if (code[0].value == "number") numbername.emplace("number");
+		else if (code[0].value == "name") numbername.emplace("name");
+		else throw error("Expected \"number\" or \"name\"");
+		numbername.emplace("null");
+		// Add length block
+		backdrop.find("topLevel")[0].value = "false";
+		parent(backdrop, parentid);
+		sprite.find("blocks").push(&backdrop);
+		node.emplace(backdropid);
+	}
+	else if (code.value == "distance") {
+		if (code.size() != 1) throw error("Expected 1 parameter");
+		std::string distanceid = id::get("distance");
+		bparser::node& distance = block(distanceid, "sensing_distanceto");
+		// Process parameter
+		bparser::node& distanceinput = distance.find("inputs").emplace("DISTANCETOMENU");
+		distanceinput.emplace("1");
+		std::string distmenuid = id::get("distancemenu");
+		distanceinput.emplace(distmenuid);
+		// Create shadow block
+		bparser::node& distancemenu = block(distmenuid, "sensing_distancetomenu");
+		distancemenu.find("topLevel")[0].value = "false";
+		distancemenu.find("shadow")[0].value = "true";
+		parent(distancemenu, distanceid);
+		bparser::node& distfield = distancemenu.find("fields").emplace("DISTANCETOMENU");
+		distfield.emplace(code[0].value).string = true;
+		distfield.emplace("null");
+		sprite.find("blocks").push(&distancemenu);
+		// Add distance block
+		distance.find("topLevel")[0].value = "false";
+		parent(distance, parentid);
+		sprite.find("blocks").push(&distance);
+		node.emplace(distanceid);
+	}
+	else if (code.value == "current") {
+		if (code.size() != 1) throw error("Expected 1 parameter");
+		std::string mathid = id::get("current");
+		bparser::node& math = block(mathid, "sensing_current");
+		// Process function
+		bparser::node& op = math.find("fields").emplace("CURRENTMENU");
+		op.emplace(code[0].value);
+		op.emplace("null");
+		// Add to sprite
+		math.find("topLevel")[0].value = "false";
+		parent(math, parentid);
+		sprite.find("blocks").push(&math);
+		node.emplace(mathid);
+	}
+	else if (code.value == "property") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		std::string propertyid = id::get("of");
+		bparser::node& property = block(propertyid, "sensing_of");
+		// Process property
+		bparser::node& field = property.find("fields").emplace("PROPERTY");
+		field.emplace(code[0].value);
+		field.emplace("null");
+		// Process object
+		std::string propertyobjid = id::get("ofobjmenu");
+		bparser::node& propertyobj = block(propertyobjid, "sensing_of_object_menu");
+		parent(propertyobj, propertyid);
+		// Create shadow block
+		bparser::node& propertyobjmenu = propertyobj.find("fields").emplace("OBJECT");
+		propertyobjmenu.emplace(code[1].value);
+		propertyobjmenu.emplace("null");
+		propertyobj.find("topLevel")[0].value = "false";
+		propertyobj.find("shadow")[0].value = "true";
+		sprite.find("blocks").push(&propertyobj);
+		// Add shadow block to inputs
+		bparser::node& shadow = property.find("inputs").emplace("OBJECT");
+		shadow.emplace("1");
+		shadow.emplace(propertyobjid);
+		// Add to sprite
+		property.find("topLevel")[0].value = "false";
+		parent(property, parentid);
+		sprite.find("blocks").push(&property);
+		node.emplace(propertyid);
+	}
 	else if (code.value == "join") {
 		if (code.size() != 2) throw error("Expected 2 parameters");
 		std::string joinid = id::get("join");
@@ -122,7 +273,7 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		if (code.size() != 2) throw error("Expected 2 parameters");
 		std::string letterid = id::get("letter");
 		bparser::node& letter = block(letterid, "operator_letter_of");
-		try { letter.find("inputs").push(&parameter_number(sprite, code[0], letterid, true)).value = "LETTER"; }
+		try { letter.find("inputs").push(&parameter_number(sprite, code[0], letterid, true, true)).value = "LETTER"; }
 		catch (std::exception e) { throw error(0, e); }
 		try { letter.find("inputs").push(&parameter_string(sprite, code[1], letterid)).value = "STRING"; }
 		catch (std::exception e) { throw error(1, e); }
@@ -138,7 +289,7 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		bparser::node& length = block(lengthid, "operator_length");
 		try { length.find("inputs").push(&parameter_string(sprite, code[0], lengthid)).value = "STRING"; }
 		catch (std::exception e) { throw error(0, e); }
-		// Add letter block
+		// Add length block
 		length.find("topLevel")[0].value = "false";
 		parent(length, parentid);
 		sprite.find("blocks").push(&length);
@@ -150,11 +301,25 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		bparser::node& round = block(roundid, "operator_round");
 		try { round.find("inputs").push(&parameter_number(sprite, code[0], roundid)).value = "NUM"; }
 		catch (std::exception e) { throw error(0, e); }
-		// Add letter block
+		// Add round block
 		round.find("topLevel")[0].value = "false";
 		parent(round, parentid);
 		sprite.find("blocks").push(&round);
 		node.emplace(roundid);
+	}
+	else if (code.value == "random") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		std::string randomid = id::get("random");
+		bparser::node& random = block(randomid, "operator_random");
+		try { random.find("inputs").push(&parameter_number(sprite, code[0], randomid)).value = "FROM"; }
+		catch (std::exception e) { throw error(0, e); }
+		try { random.find("inputs").push(&parameter_number(sprite, code[1], randomid)).value = "TO"; }
+		catch (std::exception e) { throw error(1, e); }
+		// Add random block
+		random.find("topLevel")[0].value = "false";
+		parent(random, parentid);
+		sprite.find("blocks").push(&random);
+		node.emplace(randomid);
 	}
 	// Math operators
 	else if (code.value == "+" || code.value == "-" || code.value == "*" || code.value == "/") {
@@ -176,6 +341,20 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		parent(*math, parentid);
 		sprite.find("blocks").push(math);
 		node.emplace(mathid);
+	}
+	else if (code.value == "mod") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		std::string modid = id::get("mod");
+		bparser::node& mod = block(modid, "operator_mod");
+		try { mod.find("inputs").push(&parameter_number(sprite, code[0], modid)).value = "NUM1"; }
+		catch (std::exception e) { throw error(0, e); }
+		try { mod.find("inputs").push(&parameter_number(sprite, code[1], modid)).value = "NUM2"; }
+		catch (std::exception e) { throw error(1, e); }
+		// Add mod block
+		mod.find("topLevel")[0].value = "false";
+		parent(mod, parentid);
+		sprite.find("blocks").push(&mod);
+		node.emplace(modid);
 	}
 	// Math functions e.g. (math abs 2.5)
 	else if (code.value == "math") {
@@ -209,7 +388,8 @@ bparser::node& parameter_string(bparser::node& sprite, bparser::node& code, std:
 	}
 	else {
 		node.emplace("3");
-		parameter_generic(sprite, code, node, parentid);
+		try { parameter_generic(sprite, code, node, parentid); }
+		catch (std::exception e) { throw error(code.value, e); }
 		// Default
 		bparser::node& hidden = node.emplace("");
 		hidden.emplace("10");
@@ -218,23 +398,40 @@ bparser::node& parameter_string(bparser::node& sprite, bparser::node& code, std:
 
 	return node;
 }
-bparser::node& parameter_number(bparser::node& sprite, bparser::node& code, std::string parentid, bool posint) {
+bparser::node& parameter_number(bparser::node& sprite, bparser::node& code, std::string parentid, bool positive, bool integer) {
 	bparser::node& node = *(new bparser::node(""));
 	// Use value if no subnodes
 	if (code.size() == 0) {
 		node.emplace("1");
 		bparser::node& inner = node.emplace("");
-		inner.emplace(posint ? "6" : "4");
-		if (!posint && !checknum(code.value)) throw error("Expected number");
-		if (posint && !checkint(code.value, true)) throw error("Expected positive integer");
+		if (!positive && !integer) {
+			inner.emplace("4");
+			if (!checknum(code.value)) throw error("Expected number");
+		}
+		else if (positive && !integer) {
+			inner.emplace("5");
+			if (!checknum(code.value, true)) throw error("Expected positive number");
+		}
+		else if (!positive && integer) {
+			inner.emplace("7");
+			if (!checknum(code.value, false, true)) throw error("Expected integer");
+		}
+		else if (positive && integer) {
+			inner.emplace("6");
+			if (!checknum(code.value, true, true)) throw error("Expected positive integer");
+		}
 		inner.emplace(code.value);
 	}
 	else {
 		node.emplace("3");
-		parameter_generic(sprite, code, node, parentid);
+		try { parameter_generic(sprite, code, node, parentid); }
+		catch (std::exception e) { throw error(code.value, e); }
 		// Default
 		bparser::node& hidden = node.emplace("");
-		hidden.emplace("4");
+		if (!positive && !integer) hidden.emplace("4");
+		if (positive && !integer) hidden.emplace("5");
+		if (!positive && integer) hidden.emplace("7");
+		if (positive && integer) hidden.emplace("6");
 		hidden.emplace("0");
 	}
 

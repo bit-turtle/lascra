@@ -4,7 +4,7 @@
 #include <sstream>
 
 // Make sure it is a valid number
-bool checknum(std::string& num) {
+bool checknum(std::string& num, bool positive, bool integer) {
 	std::istringstream nstr(num);
 	bool decimal = false;
 	bool first = true;
@@ -12,9 +12,12 @@ bool checknum(std::string& num) {
 	while (nstr.get(c)) {
 		switch (c) {
 			case '-':
+				if (positive) return false;
 				if (!first) return false;
 				first = true;
+				break;
 			case '.':
+				if (integer) return false;
 				if (decimal) return false;
 				decimal = true;
 				first = false;
@@ -34,24 +37,6 @@ bool checknum(std::string& num) {
 				break;
 			default:
 				return false;
-		}
-	}
-	return true;
-}
-
-// Make sure it is a valid integer
-bool checkint(std::string& num, bool positive) {
-	if (!checknum(num)) return false;
-	std::istringstream nstr(num);
-	char c;
-	while (nstr.get(c)) {
-		switch (c) {
-			case '-':
-				if (positive) return false;
-				break;
-			case '.':
-				return false;
-				break;
 		}
 	}
 	return true;

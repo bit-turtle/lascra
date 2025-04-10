@@ -119,15 +119,17 @@ int main(int argc, char* argv[]) {
 			return EXIT_FAILURE;
 		}
 	}
+	std::cout << "Compiled all files!" << std::endl;
 
 	// Update sprite.json
+	std::cout << "Updating Sprite file... ";
 	std::stringstream newjson;
 	bparser::json::encode(spriteroot, newjson);
-	std::cout << newjson.str() << std::endl;
+	if (cmdl[{"-d", "--display"}]) std::cout << newjson.str() << std::endl;
 	spritejson->SetCompressionStream(newjson);
-
 	// Save updated file
 	ZipFile::SaveAndClose(sprite3, sprite3filename);
+	std::cout << "Done!" << std::endl;
 	
 	return EXIT_SUCCESS;
 }

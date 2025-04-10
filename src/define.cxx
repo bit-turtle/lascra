@@ -33,7 +33,6 @@ void list(bparser::node& sprite, bparser::node& code) {
 	for (int i = 1; i < code.size(); i++) {
 		arr->emplace(code[i].value);
 	}
-	list->display("  ", "- ");
 	// Add list
 	if (arr->size() == 1) list->emplace("").push(arr);
 	else list->push(arr);
