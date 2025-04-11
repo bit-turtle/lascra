@@ -2,7 +2,7 @@
 
 #include "block.hxx"
 
-bparser::node& block(std::string id, std::string opcode, bool shadow) {
+bparser::node& block(std::string id, std::string opcode, bool topLevel, bool shadow) {
 	bparser::node& block = *(new bparser::node(id));
 	block.emplace("opcode").emplace(opcode);
 	block.emplace("next").emplace("null");
@@ -10,7 +10,7 @@ bparser::node& block(std::string id, std::string opcode, bool shadow) {
 	block.emplace("inputs");
 	block.emplace("fields");
 	block.emplace("shadow").emplace(shadow ? "true" : "false");
-	block.emplace("topLevel").emplace("true");
+	block.emplace("topLevel").emplace( ( (topLevel) ? "true" : "false" ) );
 	return block;
 }
 

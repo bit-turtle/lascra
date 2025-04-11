@@ -1,0 +1,7 @@
+(declare
+	(name "Extentions Example")
+)
+(when flag
+	(say (join "Video Motion on Sprite: " (video motion sprite) ) )
+	(say (join "Boost Motor A Position: " (boost_motorpos A) ) )
+)

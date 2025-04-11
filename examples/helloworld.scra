@@ -1,0 +1,6 @@
+(declare
+	(name "Hello, World! Example"
+)
+(when flag
+	(say "Hello, World!")
+)

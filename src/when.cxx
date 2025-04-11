@@ -20,11 +20,11 @@ void when(bparser::node& sprite, bparser::node& params) {
 	bparser::node* prevblock;
 	if (params[0].value == "flag") {
 		previd = id::get("flag");
-		prevblock = &block(previd, "event_whenflagclicked", false);
+		prevblock = &block(previd, "event_whenflagclicked");
 	}
 	else if (params[0].value == "clicked") {
 		previd = id::get("clicked");
-		prevblock = &block(previd, "event_whenthisspriteclicked", false);
+		prevblock = &block(previd, "event_whenthisspriteclicked");
 	}
 	sprite.find("blocks").push(prevblock);
 	// Code in event

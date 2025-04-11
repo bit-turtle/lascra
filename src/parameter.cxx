@@ -9,6 +9,20 @@
 
 #include <string>
 
+bparser::node* field(std::string value) {
+	bparser::node* field = new bparser::node("");
+	field->emplace(value);
+	field->emplace("null");
+	return field;
+}
+
+bparser::node* shadow(std::string id) {
+	bparser::node* shadow = new bparser::node("");
+	shadow->emplace("1");
+	shadow->emplace(id);
+	return shadow;
+}
+
 void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node& node, std::string parentid) {
 	// Type
 	if (code.value == "variable") {
@@ -77,12 +91,12 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		if (code.size() != 1) throw error("Expected 1 parameter");
 		std::string val = "";
 		bparser::node* value;
-		if (code[0].value == "x_pos") {
-			val = id::get("xpos");
+		if (code[0].value == "x") {
+			val = id::get("x");
 			value = &block(val, "motion_xposition");
 		}
-		else if (code[0].value == "y_pos") {
-			val = id::get("ypos");
+		else if (code[0].value == "y") {
+			val = id::get("y");
 			value = &block(val, "motion_yposition");
 		}
 		else if (code[0].value == "direction") {
@@ -125,6 +139,7 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 			val = id::get("username");
 			value = &block(val, "sensing_username");
 		}
+		// Extensions
 		else if (code[0].value == "music_tempo") {
 			val = id::get("musictempo");
 			value = &block(val, "music_getTempo");
@@ -373,6 +388,131 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		parent(math, parentid);
 		sprite.find("blocks").push(&math);
 		node.emplace(mathid);
+	}
+	// Extensions
+	else if (code.value == "translate") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		std::string translateid = id::get("translate");
+		bparser::node& translate = block(translateid, "translate_getTranslate");
+		translate.find("topLevel")[0].value = "false";
+		parent(translate, parentid);
+		// Process parameters
+		try { translate.find("inputs").push(&parameter_string(sprite, code[0], translateid)).value = "WORDS"; }
+		catch (std::exception e) { throw error(0, "string", e); }
+		// Add language menu shadow block
+		std::string menuid = id::get("translatelanguage");
+		bparser::node& menu = block(menuid, "translate_menu_languages");
+		menu.find("topLevel")[0].value = "false";
+		menu.find("shadow")[0].value = "true";
+		bparser::node& lang = menu.find("fields").emplace("languages");
+		lang.emplace(code[1].value);
+		lang.emplace("null");
+		// Add shadow block to sprite
+		sprite.find("blocks").push(&menu);
+		// Add block to sprite
+		sprite.find("blocks").push(&translate);
+		node.emplace(translateid);
+	}
+	// Video extention
+	else if (code.value == "video") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		std::string videoid = id::get("video");
+		bparser::node& video = block(videoid, "videoSensing_videoOn");
+		video.find("topLevel")[0].value = "false";
+		parent(video, parentid);
+		// Attribute shadow block
+		std::string attrid = id::get("videoattribute");
+		bparser::node& attr = block(attrid, "videoSensing_menu_ATTRIBUTE", false, true);
+		attr.find("fields").push(field(code[0].value)).value = "ATTRIBUTE";
+		sprite.find("blocks").push(&attr);
+		video.find("inputs").push(shadow(attrid)).value = "ATTRIBUTE";
+		// Subject shadow block
+		std::string subid = id::get("videoattribute");
+		bparser::node& sub = block(subid, "videoSensing_menu_SUBJECT", false, true);
+		std::string subject;
+		if (code[1].value == "sprite") subject = "this sprite";
+		else if (code[1].value == "stage") subject = "Stage";
+		else throw error("Unknown subject (Expected \"sprite\" or \"stage\")");
+		sub.find("fields").push(field(subject)).value = "SUBJECT";
+		sprite.find("blocks").push(&sub);
+		video.find("inputs").push(shadow(subid)).value = "SUBJECT";
+		// Add video block
+		sprite.find("blocks").push(&video);
+		node.emplace(videoid);
+	}
+	// The tilts
+	else if (code.value == "boost_tilt" || code.value == "micro_tilt" || code.value == "wedo_tilt" || code.value == "go_tilt") {
+		if (code.size() != 1) throw error("Expected 1 parameter");
+		std::string tiltid = id::get("tilt");
+		bparser::node* tilt;
+		if (code.value == "boost_tilt") tilt = &block(tiltid, "boost_getTiltAngle");
+		else if (code.value == "micro_tilt") tilt = &block(tiltid, "microbit_getTiltAngle");
+		else if (code.value == "wedo_tilt") tilt = &block(tiltid, "wedo2_getTiltAngle");
+		else if (code.value == "go_tilt") tilt = &block(tiltid, "gdxfor_getTilt");
+		parent(*tilt, parentid);
+		tilt->find("topLevel")[0].value = "false";
+		// Tilt direction select shadow block
+		std::string dirid = id::get("tiltboostdir");
+		bparser::node* dir;
+		if (code.value == "boost_tilt") dir = &block(dirid, "boost_menu_TILT_DIRECTION");
+		else if (code.value == "micro_tilt") dir = &block(dirid, "microbit_menu_tiltDirection");
+		else if (code.value == "wedo_tilt") dir = &block(dirid, "wedo2_menu_TILT_DIRECTION");
+		else if (code.value == "go_tilt") dir = &block(dirid, "gdxfor_menu_tiltOptions");
+		dir->find("topLevel")[0].value = "false";
+		dir->find("shadow")[0].value = "true";
+		parent(*dir, tiltid);
+		// Parameter
+		bparser::node* param;
+		if (code.value == "boost_tilt") param = &dir->find("fields").emplace("TILT_DIRECTION");
+		else if (code.value == "micro_tilt") param = &dir->find("fields").emplace("tiltDirection");
+		else if (code.value == "wedo_tilt") param = &dir->find("fields").emplace("TILT_DIRECTION");
+		else if (code.value == "go_tilt") param = &dir->find("fields").emplace("tiltOptions");
+		param->emplace(code[0].value);
+		param->emplace("null");
+		// Add blocks
+		sprite.find("blocks").push(dir);
+		bparser::node* ref;
+		if (code.value == "boost_tilt") ref = &tilt->find("inputs").emplace("TILT_DIRECTION");
+		else if (code.value == "micro_tilt") ref = &tilt->find("inputs").emplace("DIRECTION");
+		else if (code.value == "wedo_tilt") ref = &tilt->find("inputs").emplace("TILT_DIRECTION");
+		else if (code.value == "go_tilt") ref = &tilt->find("inputs").emplace("TILT");
+		ref->emplace("1");
+		ref->emplace(dirid);
+		sprite.find("blocks").push(tilt);
+		node.emplace(tiltid);
+	}
+	// Motor pos
+	else if (code.value == "boost_motorpos" || code.value == "ev3_motorpos") {
+		if (code.size() != 1) throw error("Expected 1 parameter");
+		std::string motorposid = id::get("motorpos");
+		bparser::node* motorpos;
+		if (code.value == "boost_motorpos") motorpos = &block(motorposid, "boost_getMotorPosition");
+		else if (code.value == "ev3_motorpos") motorpos = &block(motorposid, "ev3_getMotorPosition");
+		parent(*motorpos, parentid);
+		motorpos->find("topLevel")[0].value = "false";
+		// motorpos motor select shadow block
+		std::string motorid = id::get("motor");
+		bparser::node* motor;
+		if (code.value == "boost_motorpos") motor = &block(motorid, "boost_menu_MOTOR_REPORTER_ID");
+		else if (code.value == "ev3_motorpos") motor = &block(motorid, "ev3_menu_motorPorts");
+		motor->find("topLevel")[0].value = "false";
+		motor->find("shadow")[0].value = "true";
+		parent(*motor, motorposid);
+		// Parameter
+		bparser::node* param;
+		if (code.value == "boost_motorpos") param = &motor->find("fields").emplace("MOTOR_REPORTER_ID");
+		else if (code.value == "ev3_motorpos") param = &motor->find("fields").emplace("motorPorts");
+		param->emplace(code[0].value);
+		param->emplace("null");
+		// Add blocks
+		sprite.find("blocks").push(motor);
+		bparser::node* ref;
+		if (code.value == "boost_motorpos") ref = &motorpos->find("inputs").emplace("MOTOR_REPORTER_ID");
+		else if (code.value == "ev3_motorpos") ref = &motorpos->find("inputs").emplace("PORT");
+		ref->emplace("1");
+		ref->emplace(motorid);
+		sprite.find("blocks").push(motorpos);
+		node.emplace(motorposid);
 	}
 	else throw error("Unknown type");
 }

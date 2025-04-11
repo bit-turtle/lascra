@@ -1,0 +1,10 @@
+(declare
+	(name "Parameter Example")
+)
+(define
+	(variable MyVariable "Parameters are round")
+)
+(when flag
+	(say (join "Value of MyVariable: " (variable MyVariable) ) )
+	(say (join "2+2=" (+ 2 2) ) )
+)

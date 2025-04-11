@@ -27,5 +27,6 @@ Contents of `code.scra`:
 (when clicked
     (say (join "Compiler Name: " (variable "Compiler Name") ) )
     (say (join "Square root of 2 is: " (math sqrt 2) ) )
+    (say (join "Length of \"Example List\" list: " (size "Example List") ) )
 )
 ```
