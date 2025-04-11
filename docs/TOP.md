@@ -46,8 +46,15 @@ Variables, lists, and broadcasts are created with define statements. List of def
 When statements are used to run code when a certain event happens. List of events:
 * `flag`: Green Flag Pressed
 * `clicked`: Sprite Clicked
+* `(received broadcastName)`: Broadcast Received
 ```
 (when flag
-  (say "Code runs here!")
+  (say "Green Flag Pressed!")
+)
+(when clicked
+  (say "Sprite Clicked!")
+)
+(when (received MyBroadcast)
+  (say "Received Broadcast!")
 )
 ```

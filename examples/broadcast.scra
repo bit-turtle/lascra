@@ -1,0 +1,12 @@
+(declare
+	(name "Broadcast Example")
+)
+(define
+	(broadcast MyBroadcast)
+)
+(when flag
+	(broadcast MyBroadcast)
+)
+(when (received MyBroadcast)
+	(say "Received MyBroadcast!")
+)

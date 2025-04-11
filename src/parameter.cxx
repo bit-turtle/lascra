@@ -39,9 +39,9 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		list.emplace(code[0].value);
 		list.emplace(find_list(sprite, code[0].value));
 	}
-	else if (code.value == "listlength") {
+	else if (code.value == "size") {
 		if (code.size() != 1) throw error("Expected 1 parameter");
-		std::string listlengthid = id::get("listlength");
+		std::string listlengthid = id::get("listsize");
 		bparser::node& listlength = block(listlengthid, "data_lengthoflist");
 		// Process list
 		bparser::node& list = listlength.find("fields").emplace("LIST");
@@ -228,17 +228,26 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 	}
 	else if (code.value == "current") {
 		if (code.size() != 1) throw error("Expected 1 parameter");
-		std::string mathid = id::get("current");
-		bparser::node& math = block(mathid, "sensing_current");
+		std::string currentid = id::get("current");
+		bparser::node& current = block(currentid, "sensing_current");
 		// Process function
-		bparser::node& op = math.find("fields").emplace("CURRENTMENU");
-		op.emplace(code[0].value);
-		op.emplace("null");
+		bparser::node& menu = current.find("fields").emplace("CURRENTMENU");
+		std::string time;
+		if (code[0].value == "year") time = "YEAR";
+		else if (code[0].value == "month") time = "MONTH";
+		else if (code[0].value == "date") time = "DATE";
+		else if (code[0].value == "day_of_week") time = "DAYOFWEEK";
+		else if (code[0].value == "hour") time = "HOUR";
+		else if (code[0].value == "minute") time = "MINUTE";
+		else if (code[0].value == "second") time = "SECOND";
+		else throw error("Unknown time period, try \"year\"");
+		menu.emplace(time);
+		menu.emplace("null");
 		// Add to sprite
-		math.find("topLevel")[0].value = "false";
-		parent(math, parentid);
-		sprite.find("blocks").push(&math);
-		node.emplace(mathid);
+		current.find("topLevel")[0].value = "false";
+		parent(current, parentid);
+		sprite.find("blocks").push(&current);
+		node.emplace(currentid);
 	}
 	else if (code.value == "property") {
 		if (code.size() != 2) throw error("Expected 2 parameters");

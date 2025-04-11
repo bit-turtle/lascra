@@ -1,4 +1,4 @@
-# File Structure
+# File Structure (`.scra` files)
 The code files for lascra are organized into 3 different layers
 1. Top Level Statements which structure the sprite as a whole `TOP.md`
   - `define` variables, lists, and broadcasts

@@ -1,0 +1,13 @@
+(declare
+	(name "Forever Example")
+)
+(define
+	(variable counter 0)
+)
+(when flag
+	(set counter 0)
+	(forever
+		(say (join "counter value: " (variable counter) ) )
+		(change counter 1)
+	)
+)

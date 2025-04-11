@@ -1,5 +1,8 @@
 # lascra (Lisp and Scratch)
 lascra is a compiler that compiles a lisp like language into scratch sprite3 files
+## Information
+* Documentation in `docs` folder
+* Not all scratch blocks are supported at the moment.
 ## Usage
 `lascra sprite.sprite3 [code files...]`
 * Opens `sprite.json` in `sprite.sprite3`
@@ -12,21 +15,24 @@ lascra is a compiler that compiles a lisp like language into scratch sprite3 fil
 Contents of `code.scra`:
 ```
 (declare
-    (name "MySprite")
+    (name MySprite)
 )
 (define
-    (variable "Compiler Name" "lascra")
-    (list "Example List" "thing1" "thing2" "thing3")
-    (broadcast "Example Broadcast")
+    (variable counter 0)
 )
 (when flag
     (say "Hello, World!")
-    (say "Length of \"apple\": " (length "apple") )
-    (say (join "Two plus two, times two equals: " (* (+ 2 2) 2) ) )
-)
-(when clicked
-    (say (join "Compiler Name: " (variable "Compiler Name") ) )
-    (say (join "Square root of 2 is: " (math sqrt 2) ) )
-    (say (join "Length of \"Example List\" list: " (size "Example List") ) )
+    (say (join 
+        "2*4+3="
+        (+ (* 2 4) 3)
+    ) )
+    (set counter 0)
+    (forever
+        (say (join
+            "Value of Counter: "
+            (variable counter)
+        ) )
+        (change counter 1)
+    )
 )
 ```

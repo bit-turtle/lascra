@@ -5,6 +5,7 @@
 #include "id.hxx"
 #include "block.hxx"
 #include "error.hxx"
+#include "find.hxx"
 
 #include "code.hxx"
 
@@ -25,6 +26,15 @@ void when(bparser::node& sprite, bparser::node& params) {
 	else if (params[0].value == "clicked") {
 		previd = id::get("clicked");
 		prevblock = &block(previd, "event_whenthisspriteclicked");
+	}
+	else if (params[0].value == "received") {
+		if (params[0].size() != 1) throw error("Expected broadcast name");
+		previd = id::get("received");
+		prevblock = &block(previd, "event_whenbroadcastreceived");
+		bparser::node& broadcast = prevblock->find("fields").emplace("BROADCAST_OPTION");
+		broadcast.emplace(params[0][0].value);
+		try { broadcast.emplace(find_broadcast(sprite, params[0][0].value)); }
+		catch (std::exception e) { throw error("received", e); }
 	}
 	sprite.find("blocks").push(prevblock);
 	// Code in event
