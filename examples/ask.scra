@@ -1,0 +1,31 @@
+(declare
+	(name "Ask Example")
+)
+(define
+	(variable oldanswer)
+)
+(when flag
+	(ask "Name a fruit")
+	(if (= (value answer) "orange")
+		(say "Oranges are juicy")
+	)
+	(elif (= (value answer) "apple")
+		(say "Did you know apple seeds have cyanide?")
+	)
+	(else
+		(say "Cool fruit!")
+	)
+	(wait 5)
+	(ask "What is 2+2?")
+	(set oldanswer (value answer) )
+	(ask "What is 2-2?")
+	(if (and (= (variable oldanswer) 4) (= (value answer) 0) )
+		(say "You got all the questions correct!")
+	)
+	(elif (or (= (variable oldanswer) 4) (= (value answer) 0) )
+		(say "You got some of the questions correct")
+	)
+	(else
+		(say "You got all the questions wrong")
+	)
+)

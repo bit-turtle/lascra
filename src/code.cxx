@@ -284,6 +284,17 @@ std::string hide(bparser::node& sprite, bparser::node& code) {
 	sprite.find("blocks").push(&hide);
 	return id;
 }
+// Sensing
+std::string ask(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 1) throw error("Expected 1 parameter");
+	std::string id = id::get("ask");
+	bparser::node& ask = block(id, "sensing_askandwait", false);
+	try { ask.find("inputs").push(&parameter_string(sprite, param[0], id)).value = "QUESTION"; }
+	catch (std::exception e) { throw error("question", e); }
+	sprite.find("blocks").push(&ask);
+	return id;
+}
+
 
 // Main Code Function
 std::string code(bparser::node& sprite, bparser::node& code, bparser::node* previf) {
@@ -313,6 +324,8 @@ std::string code(bparser::node& sprite, bparser::node& code, bparser::node* prev
 		else if (code.value == "change") return change(sprite, code);
 		else if (code.value == "show") return show(sprite, code);
 		else if (code.value == "hide") return hide(sprite, code);
+		// Sensing
+		else if (code.value == "ask") return ask(sprite, code);
 		else throw error("Unknown command");
 	}
 	catch (std::exception e) {

@@ -592,7 +592,29 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 	node.emplace("2");
 
 	bparser::node* boolean;
-	if (code.value == "=") {
+	if (code.value == "and") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		boolean = &block(id::get("and"), "operator_and");
+		try { boolean->find("inputs").push(&parameter_bool(sprite, code[0], boolean->value)).value = "OPERAND1"; }
+		catch (std::exception e) { throw error(0, e); }
+		try { boolean->find("inputs").push(&parameter_bool(sprite, code[1], boolean->value)).value = "OPERAND2"; }
+		catch (std::exception e) { throw error(1, e); }
+	}
+	else if (code.value == "or") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		boolean = &block(id::get("or"), "operator_or");
+		try { boolean->find("inputs").push(&parameter_bool(sprite, code[0], boolean->value)).value = "OPERAND1"; }
+		catch (std::exception e) { throw error(0, e); }
+		try { boolean->find("inputs").push(&parameter_bool(sprite, code[1], boolean->value)).value = "OPERAND2"; }
+		catch (std::exception e) { throw error(1, e); }
+	}
+	else if (code.value == "not") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		boolean = &block(id::get("or"), "operator_or");
+		try { boolean->find("inputs").push(&parameter_bool(sprite, code[0], boolean->value)).value = "OPERAND"; }
+		catch (std::exception e) { throw error(0, e); }
+	}
+	else if (code.value == "=") {
 		if (code.size() != 2) throw error("Expected 2 parameters");
 		boolean = &block(id::get("equals"), "operator_equals");
 		try { boolean->find("inputs").push(&parameter_string(sprite, code[0], boolean->value)).value = "OPERAND1"; }

@@ -22,17 +22,32 @@ Contents of `code.scra`:
 )
 (when flag
     (say "Hello, World!")
+    (wait 5)
     (say (join 
         "2*4+3="
         (+ (* 2 4) 3)
     ) )
+    (wait 5)
     (set counter 0)
-    (forever
+    (say "Counting to 10")
+    (wait 5)
+    (repeat_until (= (variable counter) 10)
+        (wait 1)
+        (change counter 1)
         (say (join
             "Value of Counter: "
             (variable counter)
         ) )
-        (change counter 1)
+    )
+    (wait 1)
+    (say "Done!")
+    (wait 5)
+    (ask "What is 2+2?")
+    (if (= (value answer) 4)
+        (say "Correct!")
+    )
+    (else
+        (say "Incorrect")
     )
 )
 ```
