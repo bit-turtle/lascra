@@ -32,4 +32,5 @@
 #include <string>
 
 // Returns block id
-std::string code(bparser::node& sprite, bparser::node& code);
+std::string substack(bparser::node& sprite, bparser::node& param, int offset, std::string parentid);
+std::string code(bparser::node& sprite, bparser::node& code, bparser::node* previf = nullptr);

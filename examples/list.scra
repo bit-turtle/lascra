@@ -1,0 +1,17 @@
+(declare
+	(name "List Example")
+)
+(define
+	(list MyList
+		"One Thing"
+		"Another Thing"
+	)
+)
+(when flag
+	(if (list_contains MyList "Another Thing")
+		(say "MyList contains Another Thing")
+	)
+	(else
+		(say "Another Thing was not found in MyList")
+	)
+)

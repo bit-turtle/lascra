@@ -8,6 +8,7 @@ bool checknum(std::string& num, bool positive, bool integer) {
 	std::istringstream nstr(num);
 	bool decimal = false;
 	bool first = true;
+	bool zerofirst = false;
 	char c;
 	while (nstr.get(c)) {
 		switch (c) {
@@ -21,9 +22,13 @@ bool checknum(std::string& num, bool positive, bool integer) {
 				if (decimal) return false;
 				decimal = true;
 				first = false;
+				zerofirst = false;
 				break;
 			case '0':
-				if (first) return false;
+				if (zerofirst) return false;
+				if (first) zerofirst = true;
+				first = false;
+				break;
 			case '1':
 			case '2':
 			case '3':
@@ -33,6 +38,7 @@ bool checknum(std::string& num, bool positive, bool integer) {
 			case '7':
 			case '8':
 			case '9':
+				if (zerofirst) return false;
 				first = false;
 				break;
 			default:

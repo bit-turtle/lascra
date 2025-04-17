@@ -1,0 +1,24 @@
+(declare
+	(name "When Example")
+)
+(define
+	(broadcast MyBroadcast)
+)
+(when flag
+	(say "Green Flag Pressed")
+)
+(when clicked
+	(say "Sprite Clicked")
+)
+(when (pressed space)
+	(say "Space Pressed")
+)
+(when (received MyBroadcast)
+	(say "Broadcast Received")
+)
+(when (loudness 15)
+	(say "Loudness Greater Than 15")
+)
+(when (timer 100)
+	(say "Timer Greater Than 100")
+)

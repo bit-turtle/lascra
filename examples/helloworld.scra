@@ -1,5 +1,5 @@
 (declare
-	(name "Hello, World! Example"
+	(name "Hello, World! Example")
 )
 (when flag
 	(say "Hello, World!")

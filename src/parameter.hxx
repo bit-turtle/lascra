@@ -20,6 +20,12 @@
 #include <string>
 
 // Parameter function, returns a scratch enum
+
+// String Parameter, Accepts strings or generic parameters
 bparser::node& parameter_string(bparser::node& sprite, bparser::node& code, std::string parentid);
 
+// Number Parameter, Accepts numbers or generic parameters
 bparser::node& parameter_number(bparser::node& sprite, bparser::node& code, std::string parentid, bool positive = false, bool integer = false);
+
+// Boolean parameter, Accepts boolean blocks
+bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::string parentid);

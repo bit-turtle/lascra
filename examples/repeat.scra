@@ -1,0 +1,14 @@
+(declare
+	(name "Repeat Example")
+)
+(define
+	(variable counter 0)
+)
+(when flag
+	(set counter 0)
+	(repeat 10
+		(change counter 1)
+		(say (variable counter) )
+	)
+	(say "Done!")
+)

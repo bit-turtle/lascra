@@ -1,0 +1,15 @@
+(declare
+	(name "Clone Example")
+)
+(when flag
+	(say "Clones!")
+	(forever
+		(clone _myself_)
+		(wait 2)
+	)
+)
+(when clone
+	(say "I am a clone!")
+	(wait 10)
+	delete_clone
+)

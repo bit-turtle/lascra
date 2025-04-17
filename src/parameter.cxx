@@ -336,9 +336,9 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		std::string randomid = id::get("random");
 		bparser::node& random = block(randomid, "operator_random");
 		try { random.find("inputs").push(&parameter_number(sprite, code[0], randomid)).value = "FROM"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception e) { throw error(0, "from", e); }
 		try { random.find("inputs").push(&parameter_number(sprite, code[1], randomid)).value = "TO"; }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception e) { throw error(1, "to", e); }
 		// Add random block
 		random.find("topLevel")[0].value = "false";
 		parent(random, parentid);
@@ -583,6 +583,65 @@ bparser::node& parameter_number(bparser::node& sprite, bparser::node& code, std:
 		if (positive && integer) hidden.emplace("6");
 		hidden.emplace("0");
 	}
+
+	return node;
+}
+
+bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::string parentid) {
+	bparser::node& node = *(new bparser::node(""));
+	node.emplace("2");
+
+	bparser::node* boolean;
+	if (code.value == "=") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		boolean = &block(id::get("equals"), "operator_equals");
+		try { boolean->find("inputs").push(&parameter_string(sprite, code[0], boolean->value)).value = "OPERAND1"; }
+		catch (std::exception e) { throw error(0, e); }
+		try { boolean->find("inputs").push(&parameter_string(sprite, code[1], boolean->value)).value = "OPERAND2"; }
+		catch (std::exception e) { throw error(1, e); }
+	}
+	else if (code.value == ">") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		boolean = &block(id::get("equals"), "operator_gt");
+		try { boolean->find("inputs").push(&parameter_string(sprite, code[0], boolean->value)).value = "OPERAND1"; }
+		catch (std::exception e) { throw error(0, e); }
+		try { boolean->find("inputs").push(&parameter_string(sprite, code[1], boolean->value)).value = "OPERAND2"; }
+		catch (std::exception e) { throw error(1, e); }
+	}
+	else if (code.value == "<") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		boolean = &block(id::get("equals"), "operator_lt");
+		try { boolean->find("inputs").push(&parameter_string(sprite, code[0], boolean->value)).value = "OPERAND1"; }
+		catch (std::exception e) { throw error(0, e); }
+		try { boolean->find("inputs").push(&parameter_string(sprite, code[1], boolean->value)).value = "OPERAND2"; }
+		catch (std::exception e) { throw error(1, e); }
+	}
+	else if (code.value == "contains") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		boolean = &block(id::get("equals"), "operator_contains");
+		try { boolean->find("inputs").push(&parameter_string(sprite, code[0], boolean->value)).value = "STRING1"; }
+		catch (std::exception e) { throw error(0, e); }
+		try { boolean->find("inputs").push(&parameter_string(sprite, code[1], boolean->value)).value = "STRING2"; }
+		catch (std::exception e) { throw error(1, e); }
+	}
+	else if (code.value == "list_contains") {
+		if (code.size() != 2) throw error("Expected 2 parameters");
+		boolean = &block(id::get("equals"), "data_listcontainsitem");
+		try {
+			bparser::node& list = boolean->find("fields").emplace("LIST");
+			list.emplace(code[0].value);
+			list.emplace(find_list(sprite, code[0].value));
+		}
+		catch (std::exception e) { throw error(0, e); }
+		try { boolean->find("inputs").push(&parameter_string(sprite, code[1], boolean->value)).value = "ITEM"; }
+		catch (std::exception e) { throw error(1, e); }
+	}
+	else throw error("Unknown boolean parameter");
+
+	// Add block
+	parent(*boolean, parentid);
+	node.emplace(boolean->value);
+	sprite.find("blocks").push(boolean);
 
 	return node;
 }

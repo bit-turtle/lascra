@@ -1,0 +1,23 @@
+(declare
+	(name "C-Block Example")
+)
+(define
+	(variable counter 0)
+)
+(when flag
+	(set counter 0)
+	(repeat_until (= (variable counter) 10)
+		(change counter 1)
+		(say (variable counter) )
+	)
+	(set counter (random 0 1) )
+	(if (= (variable counter) 0)
+		(say "Heads!")
+	)
+	(else
+		(say "Tails!")
+	)
+	(if (= (value username) "hotdogz7_")
+		(say "Hello Hotdogz7!")
+	)
+)

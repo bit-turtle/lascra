@@ -1,0 +1,14 @@
+(declare
+	(name "If-Else Example")
+)
+(when flag
+	(if (= 20 20)
+		(say "2020")
+	)
+	(elif (= 24 24)
+		(say "2424")
+	)
+	(else
+		(say "Not 2020")
+	)
+)
