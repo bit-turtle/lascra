@@ -26,7 +26,7 @@ FetchContent_MakeAvailable( bparser )
 
 # ziplib
 FetchContent_Declare( ZipLib
-	GIT_REPOSITORY https://github.com/DreamyCecil/ZipLib
+	GIT_REPOSITORY https://github.com/bit-turtle/ZipLib
 	GIT_TAG master
 	EXCLUDE_FROM_ALL
 	SYSTEM
