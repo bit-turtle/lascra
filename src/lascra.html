@@ -53,9 +53,20 @@ const code = document.getElementById("code");
 const compile = document.getElementById("compile");
 const result = document.getElementById("result");
 const download = document.getElementById("download");
+// Read Sprite3 File with FileReader API
+sprite.addEventListener("change", (event) => {
+	download.download = event.target.files[0].name;
+	const reader = new FileReader();
+	reader.onload = (event) => {
+		const arrayBuffer = event.target.result;
+		const byteArray = new Uint8Array(arrayBuffer);
+		FS.writeFile("sprite", byteArray);
+	};
+	reader.readAsArrayBuffer(event.target.files[0]);
+});
+// Compile Sprite
 async function lascra() {
 	let args = ["sprite"];
-	if (sprite.files[0] != undefined) FS.writeFile(args[0], await sprite.files[0].bytes());
 	if (remove.value == "keep") args.push("-k");
 	else if (remove.value == "erase") args.push("-e");
 	for (let file = 0; file < code.files.length; file++) {
@@ -72,7 +83,6 @@ async function lascra() {
 	if (ret == 0) {
 		result.textContent = "Compiled!";
 		// Update Download Link
-		download.download = sprite.files[0].name;
 		var url = URL.createObjectURL(new Blob([FS.readFile("sprite").buffer], {type: 'application/octet-stream'}));
 		download.href = url;
 		download.style = "display: block";

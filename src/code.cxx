@@ -256,7 +256,7 @@ std::string change(bparser::node& sprite, bparser::node& code) {
 	sprite.find("blocks").push(&change);
 	return id;
 }
-std::string show(bparser::node& sprite, bparser::node& code) {
+std::string show_variable(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 2) throw error("Expected 2 parameters");
 	bool list;
 	if (code[0].value == "variable") list = false;
@@ -270,7 +270,7 @@ std::string show(bparser::node& sprite, bparser::node& code) {
 	sprite.find("blocks").push(&show);
 	return id;
 }
-std::string hide(bparser::node& sprite, bparser::node& code) {
+std::string hide_variable(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 2) throw error("Expected 2 parameters");
 	bool list;
 	if (code[0].value == "variable") list = false;
@@ -322,8 +322,8 @@ std::string code(bparser::node& sprite, bparser::node& code, bparser::node* prev
 		// Data
 		else if (code.value == "set") return set(sprite, code);
 		else if (code.value == "change") return change(sprite, code);
-		else if (code.value == "show") return show(sprite, code);
-		else if (code.value == "hide") return hide(sprite, code);
+		else if (code.value == "show_variable") return show_variable(sprite, code);
+		else if (code.value == "hide_variable") return hide_variable(sprite, code);
 		// Sensing
 		else if (code.value == "ask") return ask(sprite, code);
 		else throw error("Unknown command");
