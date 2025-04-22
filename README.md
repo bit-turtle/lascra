@@ -3,6 +3,7 @@ lascra is a compiler that compiles a lisp like language into scratch sprite3 fil
 ## Information
 * Documentation in `docs` folder
 * Not all scratch blocks are supported at the moment.
+* A web version can be compiled using Emscripten
 ## Usage
 `lascra sprite.sprite3 [code files...]`
 * Opens `sprite.json` in `sprite.sprite3`
@@ -10,9 +11,10 @@ lascra is a compiler that compiles a lisp like language into scratch sprite3 fil
 * Compiles code files
 * Adds generated code into `sprite.json` and saves `sprite.sprite3`
 ## Example Usage
-1. Export a Sprite in the scratch editor called "MySprite"
-2. Run `lascra MySprite.sprite3 code.scra`  
-Contents of `code.scra`:
+1. Export a Sprite in the scratch editor called "MySprite"  
+![Export Sprite](images/export.png)
+2. Run `lascra MySprite.sprite3 examples/example.scra`  
+Contents of `example.scra`:
 ```
 (declare
     (name MySprite)
@@ -51,3 +53,8 @@ Contents of `code.scra`:
     )
 )
 ```
+3. Upload the edited Sprite file in the scratch editor  
+![Upload Sprite](images/upload.png)
+
+This results in the following code:  
+![Resulting Code](images/example.png)

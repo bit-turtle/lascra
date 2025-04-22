@@ -2,9 +2,84 @@
 <html>
 	<head>
 		<title>Lascra</title>
+		<style>
+			#log { font-family: monospace; }
+		</style>
 	</head>
 	<body>
 		<h2>Lascra (Lisp and Scratch)</h2>
+		<label for="sprite">Sprite3 File:</label>
+		<input type="file" id="sprite"/>
+		<br/>
+		<label for="remove">Code Removal Level:</label>
+		<select id="remove">
+			<option value="lascra">Remove lascra-generated code</option>
+			<option value="keep">Keep all code</option>
+			<option value="erase">Erase all code</option>
+		</select>
+		<br/>
+		<label for="code">Lascra Code Files:</label>
+		<input type="file" id="code" multiple/>
+		<br/>
+		<button type="button" id="compile">Compile!</button>
+		<span id="result">Try Compiling!</span>
+		<br/>
+		<a id="download" style="display: none">Download!</a>
+		<h3>Lascra Output</h3>
+		<span id="log"/>
+		<script>
+// Override console.log
+(function () {
+    var old = console.log;
+    var logger = document.getElementById('log');
+    console.log = function () {
+      for (var i = 0; i < arguments.length; i++) {
+        if (typeof arguments[i] == 'object') {
+            logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(arguments[i], undefined, 2) : arguments[i]) + '<br />';
+        } else {
+            logger.innerHTML += arguments[i] + '<br />';
+        }
+      }
+    }
+})();
+		</script>
+		<!-- Import Lascra WebAssembly Module -->
 		<script src="lascra.js"></script>
+		<script>
+// Lascra Javascript
+const sprite = document.getElementById("sprite");
+const remove = document.getElementById("remove");
+const code = document.getElementById("code");
+const compile = document.getElementById("compile");
+const result = document.getElementById("result");
+const download = document.getElementById("download");
+async function lascra() {
+	let args = ["sprite"];
+	if (sprite.files[0] != undefined) FS.writeFile(args[0], await sprite.files[0].bytes());
+	if (remove.value == "keep") args.push("-k");
+	else if (remove.value == "erase") args.push("-e");
+	for (let file = 0; file < code.files.length; file++) {
+		// Convert all DOS line endings to UNIX line endings
+		FS.writeFile(code.files[file].name, (await code.files[file].text()).replace(/\r\n/g, '\n'));
+		args.push(code.files[file].name);
+		// std::ifstream text mode does not work correctly with emscripten
+	}
+	// Clear Log
+	document.getElementById("log").innerHTML = "";
+	// Compile Sprite
+	let ret = Module.callMain(args);
+	// Update Page
+	if (ret == 0) {
+		result.textContent = "Compiled!";
+		// Update Download Link
+		download.download = sprite.files[0].name;
+		var url = URL.createObjectURL(new Blob([FS.readFile("sprite").buffer], {type: 'application/octet-stream'}));
+		download.href = url;
+		download.style = "display: block";
+	}
+	else result.textContent = "Error!";
+}
+compile.addEventListener("click", lascra);
+		</script>
 	</body>
 </html>

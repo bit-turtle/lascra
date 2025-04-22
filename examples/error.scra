@@ -1,0 +1,10 @@
+(declare
+	(name "This Will Not Compile!")
+)
+(when flag
+	(say
+		(join
+			"What is a" (error "block that doesn't exist!")
+		)
+	)
+)
