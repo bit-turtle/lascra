@@ -547,14 +547,14 @@ bparser::node& parameter_string(bparser::node& sprite, bparser::node& code, std:
 
 	return node;
 }
-bparser::node& parameter_number(bparser::node& sprite, bparser::node& code, std::string parentid, bool positive, bool integer) {
+bparser::node& parameter_number(bparser::node& sprite, bparser::node& code, std::string parentid, bool positive, bool integer, bool angle) {
 	bparser::node& node = *(new bparser::node(""));
 	// Use value if no subnodes
 	if (code.size() == 0) {
 		node.emplace("1");
 		bparser::node& inner = node.emplace("");
 		if (!positive && !integer) {
-			inner.emplace("4");
+			inner.emplace(angle ? "8" : "4");
 			if (!checknum(code.value)) throw error("Expected number");
 		}
 		else if (positive && !integer) {
@@ -569,7 +569,7 @@ bparser::node& parameter_number(bparser::node& sprite, bparser::node& code, std:
 			inner.emplace("6");
 			if (!checknum(code.value, true, true)) throw error("Expected positive integer");
 		}
-		inner.emplace(code.value);
+		inner.emplace(code.value).string = true;
 	}
 	else {
 		node.emplace("3");

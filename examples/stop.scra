@@ -3,5 +3,5 @@
 )
 (when flag
 	(say "I will say this")
-	(stop all)
+	(stop "something")
 )

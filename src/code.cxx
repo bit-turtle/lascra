@@ -48,6 +48,156 @@ std::string move(bparser::node& sprite, bparser::node& code) {
 	sprite.find("blocks").push(&move);
 	return id;
 }
+std::string turn_right(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 1) throw error("Expected 1 parameter");
+	std::string id = id::get("turn");
+	bparser::node& turn_right = block(id, "motion_turnright", false);
+	turn_right.find("inputs").push(&parameter_number(sprite, code[0], id)).value = "DEGREES";
+	sprite.find("blocks").push(&turn_right);
+	return id;
+}
+std::string turn_left(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 1) throw error("Expected 1 parameter");
+	std::string id = id::get("turn");
+	bparser::node& turn_left = block(id, "motion_turnleft", false);
+	turn_left.find("inputs").push(&parameter_number(sprite, code[0], id)).value = "DEGREES";
+	sprite.find("blocks").push(&turn_left);
+	return id;
+}
+std::string set_x(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 1) throw error("Expected 1 parameter");
+	std::string id = id::get("setx");
+	bparser::node& setx = block(id, "motion_setx", false);
+	setx.find("inputs").push(&parameter_number(sprite, code[0], id)).value = "X";
+	sprite.find("blocks").push(&setx);
+	return id;
+}
+std::string set_y(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 1) throw error("Eypected 1 parameter");
+	std::string id = id::get("sety");
+	bparser::node& sety = block(id, "motion_sety", false);
+	sety.find("inputs").push(&parameter_number(sprite, code[0], id)).value = "Y";
+	sprite.find("blocks").push(&sety);
+	return id;
+}
+std::string change_x(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 1) throw error("Expected 1 parameter");
+	std::string id = id::get("changex");
+	bparser::node& changex = block(id, "motion_changexby", false);
+	changex.find("inputs").push(&parameter_number(sprite, code[0], id)).value = "DX";
+	sprite.find("blocks").push(&changex);
+	return id;
+}
+std::string change_y(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 1) throw error("Expected 1 parameter");
+	std::string id = id::get("changey");
+	bparser::node& changey = block(id, "motion_changeyby", false);
+	changey.find("inputs").push(&parameter_number(sprite, code[0], id)).value = "DY";
+	sprite.find("blocks").push(&changey);
+	return id;
+}
+std::string goto_pos(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 1) throw error("Expected 1 parameter");
+	std::string id = id::get("goto");
+	bparser::node& goto_pos = block(id, "motion_goto", false);
+	sprite.find("blocks").push(&goto_pos);
+	bparser::node& option = goto_pos.find("inputs").emplace("TO");
+	option.emplace("1");
+	// Shadow block
+	std::string menuid = id::get("goto_posmenu");
+	bparser::node& goto_posmenu = block(menuid, "motion_goto_menu", false, true);
+	parent(goto_posmenu, id);
+	bparser::node& menuoption = goto_posmenu.find("fields").emplace("TO");
+	menuoption.emplace(param[0].value).string = true;
+	menuoption.emplace("null");
+	sprite.find("blocks").push(&goto_posmenu);
+	option.emplace(menuid);
+	return id;
+}
+std::string goto_xy(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 2) throw error("Expected 2 parameters");
+	std::string id = id::get("goto");
+	bparser::node& gotoxy = block(id, "motion_gotoxy", false);
+	gotoxy.find("inputs").push(&parameter_number(sprite, code[0], id)).value = "X";
+	gotoxy.find("inputs").push(&parameter_number(sprite, code[1], id)).value = "Y";
+	sprite.find("blocks").push(&gotoxy);
+	return id;
+}
+std::string glide_pos(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 2) throw error("Expected 2 parameters");
+	std::string id = id::get("glide");
+	bparser::node& glide_pos = block(id, "motion_glideto", false);
+	glide_pos.find("inputs").push(&parameter_number(sprite, param[0], id)).value = "SECS";
+	sprite.find("blocks").push(&glide_pos);
+	bparser::node& option = glide_pos.find("inputs").emplace("TO");
+	option.emplace("1");
+	// Shadow block
+	std::string menuid = id::get("glide_posmenu");
+	bparser::node& glide_posmenu = block(menuid, "motion_glideto_menu", false, true);
+	parent(glide_posmenu, id);
+	bparser::node& menuoption = glide_posmenu.find("fields").emplace("TO");
+	menuoption.emplace(param[1].value).string = true;
+	menuoption.emplace("null");
+	sprite.find("blocks").push(&glide_posmenu);
+	option.emplace(menuid);
+	return id;
+}
+std::string glide_xy(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 3) throw error("Expected 3 parameters");
+	std::string id = id::get("glide");
+	bparser::node& glidexy = block(id, "motion_glidesecstoxy", false);
+	glidexy.find("inputs").push(&parameter_number(sprite, code[0], id)).value = "SECS";
+	glidexy.find("inputs").push(&parameter_number(sprite, code[1], id)).value = "X";
+	glidexy.find("inputs").push(&parameter_number(sprite, code[2], id)).value = "Y";
+	sprite.find("blocks").push(&glidexy);
+	return id;
+}
+std::string point_direction(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 1) throw error("Expected 1 parameter");
+	std::string id = id::get("direction");
+	bparser::node& direction = block(id, "motion_pointindirection", false);
+	direction.find("inputs").push(&parameter_number(sprite, code[0], id, false, false, true)).value = "DIRECTION";
+	sprite.find("blocks").push(&direction);
+	return id;
+}
+std::string point_towards(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 1) throw error("Expected 1 parameter");
+	std::string id = id::get("towards");
+	bparser::node& towards = block(id, "motion_pointtowards", false);
+	sprite.find("blocks").push(&towards);
+	bparser::node& option = towards.find("inputs").emplace("TOWARDS");
+	option.emplace("1");
+	// Shadow block
+	std::string menuid = id::get("towardsmenu");
+	bparser::node& towardsmenu = block(menuid, "motion_pointtowards_menu", false, true);
+	parent(towardsmenu, id);
+	bparser::node& menuoption = towardsmenu.find("fields").emplace("TOWARDS");
+	menuoption.emplace(param[0].value).string = true;
+	menuoption.emplace("null");
+	sprite.find("blocks").push(&towardsmenu);
+	option.emplace(menuid);
+	return id;
+}
+std::string if_on_edge_bounce(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 0) throw error("Didn't expect any parameters");
+	std::string id = id::get("bounce");
+	bparser::node& changey = block(id, "motion_ifonedgebounce", false);
+	sprite.find("blocks").push(&changey);
+	return id;
+}
+std::string set_rotation_style(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 1) throw error("Expected 1 parameter");
+	if (code[0].value != "all around" && code[0].value != "left-right" && code[0].value != "don't rotate") {
+		throw error("Invalid value (Expected \"all around\", \"left-right\", or \"don't rotate\")");
+	}
+	std::string id = id::get("rotationstyle");
+	bparser::node& rotstyle = block(id, "motion_setrotationstyle", false);
+	bparser::node& style = rotstyle.find("fields").emplace("STYLE");
+	style.emplace(code[0].value);
+	style.emplace("null");
+	sprite.find("blocks").push(&rotstyle);
+	return id;
+}
 // Looks
 std::string say(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 1) throw error("Expected 1 parameter");
@@ -184,7 +334,7 @@ std::string broadcast(bparser::node& sprite, bparser::node& code) {
 	sprite.find("blocks").push(&broadcast);
 	return id;
 }
-std::string waitbroadcast(bparser::node& sprite, bparser::node& code) {
+std::string broadcast_wait(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 1) throw error("Expected 1 parameter");
 	std::string id = id::get("move");
 	bparser::node& broadcast = block(id, "event_broadcastandwait", false);
@@ -302,11 +452,25 @@ std::string code(bparser::node& sprite, bparser::node& code, bparser::node* prev
 	try {
 		// Motion
 		if (code.value == "move") return move(sprite, code);
+		if (code.value == "goto") return goto_pos(sprite, code);
+		if (code.value == "goto_xy") return goto_xy(sprite, code);
+		if (code.value == "glide") return glide_pos(sprite, code);
+		if (code.value == "glide_xy") return glide_xy(sprite, code);
+		if (code.value == "turn_right") return turn_right(sprite, code);
+		if (code.value == "turn_left") return turn_left(sprite, code);
+		if (code.value == "set_x") return set_x(sprite, code);
+		if (code.value == "set_y") return set_y(sprite, code);
+		if (code.value == "change_x") return change_x(sprite, code);
+		if (code.value == "change_y") return change_y(sprite, code);
+		if (code.value == "point_direction") return point_direction(sprite, code);
+		if (code.value == "point_towards") return point_towards(sprite, code);
+		if (code.value == "set_rotation_style") return set_rotation_style(sprite, code);
+		if (code.value == "if_on_edge_bounce") return if_on_edge_bounce(sprite, code);
 		// Looks
 		else if (code.value == "say") return say(sprite, code);
 		// Events
 		else if (code.value == "broadcast") return broadcast(sprite, code);
-		else if (code.value == "waitbroadcast") return waitbroadcast(sprite, code);
+		else if (code.value == "broadcast_wait") return broadcast_wait(sprite, code);
 		// Control
 		else if (code.value == "wait") return wait(sprite, code);
 		else if (code.value == "wait_until") return wait_until(sprite, code);

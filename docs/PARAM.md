@@ -17,7 +17,7 @@ The parameter statement in `say` is `join`, which takes in two parameter stateme
 * String
   - String
   - Generic Parameter
-* Boolean (Not yet implemented)
+* Boolean
   - Boolean parameters are always boolean blocks.
   - Boolean blocks:
     - (= *string* *string*)

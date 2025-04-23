@@ -8,11 +8,33 @@ Here `say` is a block which accepts a string parameter as an input `PARAM.md`
 ## List of blocks
 ### Motion
 * (move *number*)
+* (set_x *number*)
+* (set_y *number*)
+* (change_x *number*)
+* (change_y *number*)
+* (goto *spriteName*)
+  - `_mouse_` Mouse Pointer
+  - `_random_` Random Position
+* (glide *seconds* *spriteName*)
+  - `_mouse_` Mouse Pointer
+  - `_random_` Random Position
+* (goto_xy *x* *y*)
+* (glide_xy *seconds* *x* *y*)
+* (turn_right *number*)
+* (turn_left *number*)
+* (point_direction *angle*)
+* (point_towards *spriteName*)
+  - `_mouse_` Mouse Pointer
+* (set_rotation_style *rotationStyle*)
+  - `all around`
+  - `left-right`
+  - `don't rotate`
+* (if_on_edge_bounce)
 ### Looks
 * (say *string*)
 ### Events
 * (broadcast *broadcastName*)
-* (waitbroadcast *broadcastName*)
+* (broadcast_wait *broadcastName*)
 ### Control
 * (wait *seconds*)
 * (wait_until *condition*)

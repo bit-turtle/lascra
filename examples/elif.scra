@@ -6,10 +6,9 @@
 )
 (when flag
 	(say "Like Python!")
-	(set i 1)
 	(wait 2)
+	(set i 1)
 	(repeat_until (> (variable i) 5)
-		(change i 1)
 		(if (= (variable i) 1)
 			(say "First")
 		)
