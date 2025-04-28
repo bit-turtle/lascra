@@ -1,0 +1,47 @@
+(declare
+	(name "Boolean Example")
+)
+(define
+	(list thing
+		"dog"
+		"cat"
+		"goat"
+	)
+	(broadcast boolean)
+)
+(when (received boolean)
+	(if (= 2 2)
+		(say "2 = 2")
+	)
+	(wait 1)
+	(if (touching _mouse_)
+		(say "touching mouse")
+	)
+	(wait 1)
+	(if (pressed space)
+		(say "touching mouse")
+	)
+	(wait 1)
+	(if (mouse_down)
+		(say "mouse down")
+	)
+	(wait 1)
+	(if (list_contains thing "goat")
+		(say "found a goat")
+	)
+	(wait 1)
+	(ask "Type Something")
+	(if (contains (value answer) "a")
+		(say "Your answer had the letter \"a\"")
+	)
+	(wait 1)
+	(if (and (> (length (value answer)) 5) (< (length (value answer)) 10))
+		(say "Your answer was between 5 and 10 letters long")
+	)
+)
+(when flag
+	(forever
+		(broadcast_wait boolean)
+		(wait 10)
+	)
+)

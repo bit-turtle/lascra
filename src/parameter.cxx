@@ -658,6 +658,48 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 		try { boolean->find("inputs").push(&parameter_string(sprite, code[1], boolean->value)).value = "ITEM"; }
 		catch (std::exception e) { throw error(1, e); }
 	}
+	// Sensing
+	else if (code.value == "mouse_down") {
+		if (code.size() != 0) throw error("Expected no parameters");
+		boolean = &block(id::get("mousedown"), "sensing_mousedown");
+	}
+	else if (code.value == "pressed") {
+		if (code.size() != 1) throw error("Expected 1 parameter");
+		boolean = &block(id::get("pressed"), "sensing_keypressed", false);
+		// Process parameter
+		bparser::node& option = boolean->find("inputs").emplace("KEY_OPTION");
+		option.emplace("1");
+		std::string keyid = id::get("key");
+		option.emplace(keyid);
+		// Create shadow block
+		bparser::node& key = block(keyid, "sensing_keyoptions", false, true);
+		parent(key, boolean->value);
+		bparser::node& field = key.find("fields").emplace("KEY_OPTION");
+		field.emplace(code[0].value).string = true;
+		field.emplace("null");
+		sprite.find("blocks").push(&key);
+	}
+	else if (code.value == "touching") {
+		if (code.size() != 1) throw error("Expected 1 parameter");
+		boolean = &block(id::get("touching"), "sensing_touchingobject", false);
+		// Process parameter
+		bparser::node& option = boolean->find("inputs").emplace("TOUCHINGOBJECTMENU");
+		option.emplace("1");
+		std::string touchid = id::get("touch");
+		option.emplace(touchid);
+		// Create shadow block
+		bparser::node& touch = block(touchid, "sensing_touchingobjectmenu", false, true);
+		parent(touch, boolean->value);
+		bparser::node& field = touch.find("fields").emplace("TOUCHINGOBJECTMENU");
+		field.emplace(code[0].value).string = true;
+		field.emplace("null");
+		sprite.find("blocks").push(&touch);
+	}
+	// Extensions
+	else if (code.value == "go_falling") {
+		if (code.size() != 0) throw error("Expected no parameters");
+		boolean = &block(id::get("falling"), "gdxfor_isFreeFalling");
+	}
 	else throw error("Unknown boolean parameter");
 
 	// Add block

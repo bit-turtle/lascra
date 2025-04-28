@@ -344,7 +344,7 @@ std::string broadcast_wait(bparser::node& sprite, bparser::node& code) {
 	broadcastinput.emplace("11");
 	broadcastinput.emplace(code[0].value).string = true;
 	broadcastinput.emplace(find_broadcast(sprite, code[0].value));
-	broadcast.find("inputs").push(&parameter_string(sprite, code[1], id)).value = "VALUE";
+	broadcast.find("inputs").push(&parameter_string(sprite, code[0], id)).value = "VALUE";
 	sprite.find("blocks").push(&broadcast);
 	return id;
 }
