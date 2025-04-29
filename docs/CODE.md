@@ -32,6 +32,15 @@ Here `say` is a block which accepts a string parameter as an input `PARAM.md`
 * (if_on_edge_bounce)
 ### Looks
 * (say *string*)
+* (say_for *string* *seconds*)
+* (think *string*)
+* (think_for *string* *seconds*)
+* (costume *costumeName*)
+* (backdrop *backdropName*)
+* (next_costume)
+* (next_backdrop)
+* (change_size *size*)
+* (set_size *size*)
 ### Events
 * (broadcast *broadcastName*)
 * (broadcast_wait *broadcastName*)

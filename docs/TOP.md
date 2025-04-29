@@ -6,17 +6,27 @@ There are only 3 top level statements
 ## Declare statements
 Many sprite properties can be modified with declare statements. List of properties:
 * `name`: Sprite Name *string*
-* `x`: X Position *number*
-* `y`: Y Position *number*
-* `size`: Sprite Size % *number*
-* `direction`: Sprite Angle *number*
-* `volume`: Sound Volume *number*
-* `visible`: Sprite Visibility *boolean*
-* `draggable`: Sprite Draggability *boolean*
-* `rotationStyle`: Sprite Rotation Style
-  - `all around`: Normal Rotation
-  - `left-right`: Left-Right Rotation
-  - `don't rotate`: Prevent Rotation
+* `layerOrder`: Layer Number *number*
+* Sprites Only:
+  * `size`: Sprite Size % *number*
+  * `x`: X Position *number*
+  * `y`: Y Position *number*
+  * `direction`: Sprite Angle *number*
+  * `volume`: Sound Volume *number*
+  * `visible`: Sprite Visibility *boolean*
+  * `draggable`: Sprite Draggability *boolean*
+  * `rotationStyle`: Sprite Rotation Style
+    - `all around`: Normal Rotation
+    - `left-right`: Left-Right Rotation
+    - `don't rotate`: Prevent Rotation
+* Stage Only:
+  * `tempo`: Tempo in BPM *number*
+  * `videoState`: Video State
+    - `on`
+    - `off`
+    - `on-flipped`
+  * `videoTransparency`: Video Transparency % *number*
+  * `textToSpeechLanguage`: Text to Speech Language *string* (Language Code)
 ```
 (declare
   (name "MySprite")

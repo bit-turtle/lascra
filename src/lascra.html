@@ -8,7 +8,8 @@
 	</head>
 	<body>
 		<h2>Lascra (Lisp and Scratch)</h2>
-		<label for="sprite">Sprite3 File:</label>
+		<br/>
+		<label for="sprite">Sprite File:</label>
 		<input type="file" id="sprite"/>
 		<br/>
 		<label for="remove">Code Removal Level:</label>
@@ -18,15 +19,23 @@
 			<option value="erase">Erase all code</option>
 		</select>
 		<br/>
+		<input type="checkbox" id="sb3" name="sb3"/>
+		<label for="sb3">Process Sprite File as sb3 instead of sprite3</label>
+		<br/>
+		<label for="name">sb3 sprite name</label>
+		<input type="text" id="name" name="name"/>
+		<br/>
 		<label for="code">Lascra Code Files:</label>
-		<input type="file" id="code" multiple/>
+		<input type="file" id="code" name="code" multiple/>
 		<br/>
 		<button type="button" id="compile">Compile!</button>
 		<span id="result">Try Compiling!</span>
 		<br/>
 		<a id="download" style="display: none">Download!</a>
 		<h3>Lascra Output</h3>
-		<span id="log"/>
+		<span id="log"></span>
+		<br/>
+		<button type="button" id="help">Display Help Message</button>
 		<script>
 // Override console.log
 (function () {
@@ -49,10 +58,13 @@
 // Lascra Javascript
 const sprite = document.getElementById("sprite");
 const remove = document.getElementById("remove");
+const sb3 = document.getElementById("sb3");
+const name = document.getElementById("name");
 const code = document.getElementById("code");
 const compile = document.getElementById("compile");
 const result = document.getElementById("result");
 const download = document.getElementById("download");
+const help = document.getElementById("help");
 // Read Sprite3 File with FileReader API
 sprite.addEventListener("change", (event) => {
 	download.download = event.target.files[0].name;
@@ -65,8 +77,12 @@ sprite.addEventListener("change", (event) => {
 	reader.readAsArrayBuffer(event.target.files[0]);
 });
 // Compile Sprite
-async function lascra() {
+async function lascra(event) {
 	let args = ["sprite"];
+	if (sb3.checked) {
+		args.push("-s");
+		args.push(name.value || "sprite");
+	}
 	if (remove.value == "keep") args.push("-k");
 	else if (remove.value == "erase") args.push("-e");
 	for (let file = 0; file < code.files.length; file++) {
@@ -90,6 +106,13 @@ async function lascra() {
 	else result.textContent = "Error!";
 }
 compile.addEventListener("click", lascra);
+// Help Message
+help.addEventListener("click", (event) => {
+	// Clear Log
+	document.getElementById("log").innerHTML = "";
+	// Call Main
+	Module.callMain(["-h"]);
+});
 		</script>
 	</body>
 </html>

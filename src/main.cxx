@@ -41,6 +41,7 @@ int main(int argc, char* argv[]) {
 	std::string spritename;
 	lascra.add_argument("-s", "--sprite")
 		.store_into(spritename)
+		.metavar("SPRITENAME")
 		.help("specify which sprite in an sb3 file to use");
 
 	lascra.add_argument("files")
@@ -50,10 +51,10 @@ int main(int argc, char* argv[]) {
 	try {
 		lascra.parse_args(argc, argv);
 	}
-	catch (const std::exception& err) {
-		std::cerr << err.what() << std::endl;
-		std::cerr << lascra;
-		std::exit(1);
+	catch (std::exception& err) {
+		std::cout << err.what() << std::endl;
+		std::cout << lascra << std::endl;
+		return EXIT_FAILURE;
 	}
 
 	std::vector<std::string> files;
@@ -131,14 +132,7 @@ int main(int argc, char* argv[]) {
 		!sprite.exists("currentCostume") ||
 		!sprite.exists("costumes") ||
 		!sprite.exists("sounds") ||
-		!sprite.exists("volume") ||
-		!sprite.exists("visible") ||
-		!sprite.exists("x") ||
-		!sprite.exists("y") ||
-		!sprite.exists("size") ||
-		!sprite.exists("direction") ||
-		!sprite.exists("draggable") ||
-		!sprite.exists("rotationStyle")
+		!sprite.exists("volume")
 	) {
 		std::cout
 			<< "Error: Invalid sprite.json structure! (Missing value)" << std::endl;
