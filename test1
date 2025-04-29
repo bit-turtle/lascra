@@ -1,0 +1,6 @@
+(define
+	(broadcast wow)
+)
+(when (received wow)
+	(say wow)
+)
