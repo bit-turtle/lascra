@@ -4,115 +4,188 @@
 		<title>Lascra</title>
 		<style>
 			#log { font-family: monospace; }
+      html, body {
+        background-color: #fbed3b;
+      }
+      input {
+        font-family: monospace;
+        font-weight: bold;
+      }
+      main {
+        font-family: monospace;
+        background-color: #8e20ff;
+        border: 5px solid black;
+        border-radius: 100px;
+        padding: 10px;
+        text-align: center;
+        color: white;
+        font-weight: bold;
+      }
+      #logger {
+        margin-top: 20px;
+        margin-bottom: 10px;
+        background-color: black;
+        color: white;
+        border: 5px solid lightgray;
+        width: 60%;
+         padding: 5px;
+        margin-left: calc(20% - 10px);
+        text-align: left;
+      }
+      #compiler {
+        background-color: #fc6668;
+        font-weight: bold;
+        border-radius: 100px;
+        border: 5px solid black;
+        padding: 5px;
+        width: 40%;
+        margin-left: calc(30% - 20px)
+      }
+      #download {
+        border: 3px solid black;
+        max-width:8em;
+        margin-top: 15px;
+        border-radius: 20px;
+        margin-left: calc(50% - 4em - 10px);
+        background-color: #31bef7;
+        color: white;
+        text-decoration: none;
+
+      }
+      button {
+        cursor: pointer;
+        border-radius: 20px;
+        border: 3px solid black;
+        background: #f5af3d;
+        color: white;
+        font-weight: bold;
+        font-family: monospace;
+      }
+      #help {
+        background-color: #42ce9d
+      }
+      #selection {
+        background-color: #0073ff;
+        color: white;
+        font-weight: bold;
+        border-radius: 100px;
+        border: 5px solid black;
+        padding: 10px;
+        width: 80%;
+        margin-left: calc(10% - 20px)
+      }
+      input {
+        color: white;
+      }
 		</style>
 	</head>
 	<body>
-		<h2>Lascra (Lisp and Scratch)</h2>
-		<br/>
+  <main>
+		<h1>Lascra Compiler</h1>
+    <div id="selection">
 		<label for="sprite">Sprite File:</label>
 		<input type="file" id="sprite"/>
 		<br/>
-		<label for="remove">Code Removal Level:</label>
+		<label for="remove">Existing Code Removal:</label>
 		<select id="remove">
 			<option value="lascra">Remove lascra-generated code</option>
 			<option value="keep">Keep all code</option>
 			<option value="erase">Erase all code</option>
 		</select>
 		<br/>
+		<label for="sb3">SB3 Mode:</label>
 		<input type="checkbox" id="sb3" name="sb3"/>
-		<label for="sb3">Process Sprite File as sb3 instead of sprite3</label>
-		<br/>
-		<label for="name">sb3 sprite name</label>
+		<label for="name">Sprite Name:</label>
 		<input type="text" id="name" name="name"/>
 		<br/>
-		<label for="code">Lascra Code Files:</label>
+		<label for="code">Code Files:</label>
 		<input type="file" id="code" name="code" multiple/>
+    </div>
 		<br/>
 		<button type="button" id="compile">Compile!</button>
 		<span id="result">Try Compiling!</span>
 		<br/>
 		<a id="download" style="display: none">Download!</a>
-		<h3>Lascra Output</h3>
-		<span id="log"></span>
-		<br/>
+    <div id="logger"><span id="log">Welcome to Lascra!</span></div>
 		<button type="button" id="help">Display Help Message</button>
+    </main>
 		<script>
-// Override console.log
-(function () {
-    var old = console.log;
-    var logger = document.getElementById('log');
-    console.log = function () {
-      for (var i = 0; i < arguments.length; i++) {
-        if (typeof arguments[i] == 'object') {
-            logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(arguments[i], undefined, 2) : arguments[i]) + '<br />';
-        } else {
-            logger.innerHTML += arguments[i] + '<br />';
-        }
-      }
-    }
-})();
+      // Override console.log
+      (function () {
+          var old = console.log;
+          var logger = document.getElementById('log');
+          console.log = function () {
+            for (var i = 0; i < arguments.length; i++) {
+              if (typeof arguments[i] == 'object') {
+                  logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(arguments[i], undefined, 2) : arguments[i]) + '<br />';
+              } else {
+                  logger.innerHTML += arguments[i] + '<br />';
+              }
+            }
+          }
+      })();
 		</script>
 		<!-- Import Lascra WebAssembly Module -->
 		<script src="lascra.js"></script>
 		<script>
-// Lascra Javascript
-const sprite = document.getElementById("sprite");
-const remove = document.getElementById("remove");
-const sb3 = document.getElementById("sb3");
-const name = document.getElementById("name");
-const code = document.getElementById("code");
-const compile = document.getElementById("compile");
-const result = document.getElementById("result");
-const download = document.getElementById("download");
-const help = document.getElementById("help");
-// Read Sprite3 File with FileReader API
-sprite.addEventListener("change", (event) => {
-	download.download = event.target.files[0].name;
-	const reader = new FileReader();
-	reader.onload = (event) => {
-		const arrayBuffer = event.target.result;
-		const byteArray = new Uint8Array(arrayBuffer);
-		FS.writeFile("sprite", byteArray);
-	};
-	reader.readAsArrayBuffer(event.target.files[0]);
-});
-// Compile Sprite
-async function lascra(event) {
-	let args = ["sprite"];
-	if (sb3.checked) {
-		args.push("-s");
-		args.push(name.value || "sprite");
-	}
-	if (remove.value == "keep") args.push("-k");
-	else if (remove.value == "erase") args.push("-e");
-	for (let file = 0; file < code.files.length; file++) {
-		// Convert all DOS line endings to UNIX line endings
-		FS.writeFile(code.files[file].name, (await code.files[file].text()).replace(/\r\n/g, '\n'));
-		args.push(code.files[file].name);
-		// std::ifstream text mode does not work correctly with emscripten
-	}
-	// Clear Log
-	document.getElementById("log").innerHTML = "";
-	// Compile Sprite
-	let ret = Module.callMain(args);
-	// Update Page
-	if (ret == 0) {
-		result.textContent = "Compiled!";
-		// Update Download Link
-		var url = URL.createObjectURL(new Blob([FS.readFile("sprite").buffer], {type: 'application/octet-stream'}));
-		download.href = url;
-		download.style = "display: block";
-	}
-	else result.textContent = "Error!";
-}
-compile.addEventListener("click", lascra);
-// Help Message
-help.addEventListener("click", (event) => {
-	// Clear Log
-	document.getElementById("log").innerHTML = "";
-	// Call Main
-	Module.callMain(["-h"]);
-});
+      // Lascra Javascript
+      const sprite = document.getElementById("sprite");
+      const remove = document.getElementById("remove");
+      const sb3 = document.getElementById("sb3");
+      const name = document.getElementById("name");
+      const code = document.getElementById("code");
+      const compile = document.getElementById("compile");
+      const result = document.getElementById("result");
+      const download = document.getElementById("download");
+      const help = document.getElementById("help");
+      // Read Sprite3 File with FileReader API
+      sprite.addEventListener("change", (event) => {
+        download.download = event.target.files[0].name;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const arrayBuffer = event.target.result;
+          const byteArray = new Uint8Array(arrayBuffer);
+          FS.writeFile("sprite", byteArray);
+        };
+        reader.readAsArrayBuffer(event.target.files[0]);
+      });
+      // Compile Sprite
+      async function lascra(event) {
+        let args = ["sprite"];
+        if (sb3.checked) {
+          args.push("-s");
+          args.push(name.value || "sprite");
+        }
+        if (remove.value == "keep") args.push("-k");
+        else if (remove.value == "erase") args.push("-e");
+        for (let file = 0; file < code.files.length; file++) {
+          // Convert all DOS line endings to UNIX line endings
+          FS.writeFile(code.files[file].name, (await code.files[file].text()).replace(/\r\n/g, '\n'));
+          args.push(code.files[file].name);
+          // std::ifstream text mode does not work correctly with emscripten
+        }
+        // Clear Log
+        document.getElementById("log").innerHTML = "";
+        // Compile Sprite
+        let ret = Module.callMain(args);
+        // Update Page
+        if (ret == 0) {
+          result.textContent = "Compiled!";
+          // Update Download Link
+          var url = URL.createObjectURL(new Blob([FS.readFile("sprite").buffer], {type: 'application/octet-stream'}));
+          download.href = url;
+          download.style = "display: block";
+        }
+        else result.textContent = "Error!";
+      }
+      compile.addEventListener("click", lascra);
+      // Help Message
+      help.addEventListener("click", (event) => {
+        // Clear Log
+        document.getElementById("log").innerHTML = "";
+        // Call Main
+        Module.callMain(["-h"]);
+      });
 		</script>
 	</body>
 </html>
