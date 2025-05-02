@@ -8,23 +8,50 @@ Parameter statements are used to pass values into blocks
 ```
 The parameter statement in `say` is `join`, which takes in two parameter statements of strings
 ## Types of parameter statements
+* Shadow (Round dropdowns)
+  - Special String (Usually)
+  - Generic Parameter
+  - Example:
+    - `(goto _mouse_)`
+    - `(goto (variable thing) )`
 * Number
   - Number
   - Positive Number
   - Integer
   - Positive Integer
   - Generic Parameter
+  - Example:
+    - `(change variable 5)`
+    - `(change variable (value answer) )`
 * String
   - String
   - Generic Parameter
+  - Example:
+    - `(say "Hi!")`
+    - `(say (join "Hello, " (value username) ) )`
 * Boolean
   - Boolean parameters are always boolean blocks.
-  - Boolean blocks:
-    - (= *string* *string*)
-    - (> *string* *string*)
-    - (< *string* *string*)
+  - Example:
+    - `(if (= (+ 2 2) 4) (say "2+2=4") )`
+## Boolean Parameters
+* (and *boolean* *boolean*)
+* (or *boolean* *boolean*)
+* (not *boolean*)
+* (= *string* *string*)
+* (> *string* *string*)
+* (< *string* *string*)
+* (contains *string* *sequence*)
+* (list_contains *list* *item*)
+* (mouse_down)
+* (pressed *key*)
+* (touching *sprite*)
+  - `_mouse_` for mouse-pointer
+* Extentions
+  - (go_falling)
+    - Go Direct Force and Acceleration falling block
 ## Generic Parameters
 Generic parameters are blocks passed as values instead of inputing the value directly. List of generic parameters
+* (bool *boolean*)
 * (variable *variableName*)
 * (list *listName*)
 * (size *listName*)

@@ -1,0 +1,13 @@
+(declare
+	(name "Looks Example")
+)
+(when flag
+	(say_for "Looks Example" 5)
+	(think_for "Hmm......" 2)
+	(next_costume)
+	(set_size 150)
+	(repeat_until (< (value size) 50)
+		(change_size -10)
+	)
+	(next_backdrop)
+)

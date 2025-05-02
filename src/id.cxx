@@ -15,3 +15,7 @@ bool id::test(std::string id) {
 	if (id.substr(0,prefix.length()) == prefix) return true;
 	return false;
 }
+
+void id::reset() {
+	nextid = 0;
+}

@@ -16,16 +16,15 @@ bparser::node* field(std::string value) {
 	return field;
 }
 
-bparser::node* shadow(std::string id) {
-	bparser::node* shadow = new bparser::node("");
-	shadow->emplace("1");
-	shadow->emplace(id);
-	return shadow;
-}
-
 void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node& node, std::string parentid) {
 	// Type
-	if (code.value == "variable") {
+	if (code.value == "bool") {
+		try {
+			node.push(&parameter_bool(sprite, code[0], parentid)).erase(0);
+		}
+		catch (std::exception& e) { throw error(0, "bool", e); }
+	}
+	else if (code.value == "variable") {
 		if (code.size() != 1) throw error("Expected 1 parameter");
 		bparser::node& var = node.emplace("");
 		var.emplace("12");
@@ -58,12 +57,12 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		std::string itemid = id::get("item");
 		bparser::node& item = block(itemid, "data_itemoflist");
 		try { item.find("inputs").push(&parameter_number(sprite, code[0], itemid, false, true)).value = "INDEX"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		// Process list
 		bparser::node& list = item.find("fields").emplace("LIST");
 		list.emplace(code[1].value);
 		try { list.emplace(find_list(sprite, code[1].value)); }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 		// Add item block
 		item.find("topLevel")[0].value = "false";
 		parent(item, parentid);
@@ -75,12 +74,12 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		std::string itemid = id::get("item");
 		bparser::node& item = block(itemid, "data_itemnumoflist");
 		try { item.find("inputs").push(&parameter_string(sprite, code[0], itemid)).value = "ITEM"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		// Process list
 		bparser::node& list = item.find("fields").emplace("LIST");
 		list.emplace(code[1].value);
 		try { list.emplace(find_list(sprite, code[1].value)); }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 		// Add item block
 		item.find("topLevel")[0].value = "false";
 		parent(item, parentid);
@@ -205,23 +204,11 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 	else if (code.value == "distance") {
 		if (code.size() != 1) throw error("Expected 1 parameter");
 		std::string distanceid = id::get("distance");
-		bparser::node& distance = block(distanceid, "sensing_distanceto");
+		bparser::node& distance = block(distanceid, "sensing_distanceto", false);
 		// Process parameter
-		bparser::node& distanceinput = distance.find("inputs").emplace("DISTANCETOMENU");
-		distanceinput.emplace("1");
-		std::string distmenuid = id::get("distancemenu");
-		distanceinput.emplace(distmenuid);
-		// Create shadow block
-		bparser::node& distancemenu = block(distmenuid, "sensing_distancetomenu");
-		distancemenu.find("topLevel")[0].value = "false";
-		distancemenu.find("shadow")[0].value = "true";
-		parent(distancemenu, distanceid);
-		bparser::node& distfield = distancemenu.find("fields").emplace("DISTANCETOMENU");
-		distfield.emplace(code[0].value).string = true;
-		distfield.emplace("null");
-		sprite.find("blocks").push(&distancemenu);
+		try { distance.find("inputs").push(&shadow_parameter(sprite, code[0], distanceid, "distancemenu", "sensing_distancetomenu", "DISTANCETOMENU")); }
+		catch (std::exception& e) { throw error(0, "sprite", e); }
 		// Add distance block
-		distance.find("topLevel")[0].value = "false";
 		parent(distance, parentid);
 		sprite.find("blocks").push(&distance);
 		node.emplace(distanceid);
@@ -252,28 +239,15 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 	else if (code.value == "property") {
 		if (code.size() != 2) throw error("Expected 2 parameters");
 		std::string propertyid = id::get("of");
-		bparser::node& property = block(propertyid, "sensing_of");
+		bparser::node& property = block(propertyid, "sensing_of", false);
 		// Process property
 		bparser::node& field = property.find("fields").emplace("PROPERTY");
 		field.emplace(code[0].value);
 		field.emplace("null");
 		// Process object
-		std::string propertyobjid = id::get("ofobjmenu");
-		bparser::node& propertyobj = block(propertyobjid, "sensing_of_object_menu");
-		parent(propertyobj, propertyid);
-		// Create shadow block
-		bparser::node& propertyobjmenu = propertyobj.find("fields").emplace("OBJECT");
-		propertyobjmenu.emplace(code[1].value);
-		propertyobjmenu.emplace("null");
-		propertyobj.find("topLevel")[0].value = "false";
-		propertyobj.find("shadow")[0].value = "true";
-		sprite.find("blocks").push(&propertyobj);
-		// Add shadow block to inputs
-		bparser::node& shadow = property.find("inputs").emplace("OBJECT");
-		shadow.emplace("1");
-		shadow.emplace(propertyobjid);
+		try { property.find("inputs").push(&shadow_parameter(sprite, code[1], propertyid, "objmenu", "sensing_of_object_menu", "OBJECT")); }
+		catch (std::exception& e) { throw error(1, "sprite", e); }
 		// Add to sprite
-		property.find("topLevel")[0].value = "false";
 		parent(property, parentid);
 		sprite.find("blocks").push(&property);
 		node.emplace(propertyid);
@@ -284,9 +258,9 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		bparser::node& join = block(joinid, "operator_join");
 		// Parameters
 		try { join.find("inputs").push(&parameter_string(sprite, code[0], joinid)).value = "STRING1"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		try { join.find("inputs").push(&parameter_string(sprite, code[1], joinid)).value = "STRING2"; }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 		// Add join block
 		join.find("topLevel")[0].value = "false";
 		parent(join, parentid);
@@ -298,9 +272,9 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		std::string letterid = id::get("letter");
 		bparser::node& letter = block(letterid, "operator_letter_of");
 		try { letter.find("inputs").push(&parameter_number(sprite, code[0], letterid, true, true)).value = "LETTER"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		try { letter.find("inputs").push(&parameter_string(sprite, code[1], letterid)).value = "STRING"; }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 		// Add letter block
 		letter.find("topLevel")[0].value = "false";
 		parent(letter, parentid);
@@ -312,7 +286,7 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		std::string lengthid = id::get("length");
 		bparser::node& length = block(lengthid, "operator_length");
 		try { length.find("inputs").push(&parameter_string(sprite, code[0], lengthid)).value = "STRING"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		// Add length block
 		length.find("topLevel")[0].value = "false";
 		parent(length, parentid);
@@ -324,7 +298,7 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		std::string roundid = id::get("round");
 		bparser::node& round = block(roundid, "operator_round");
 		try { round.find("inputs").push(&parameter_number(sprite, code[0], roundid)).value = "NUM"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		// Add round block
 		round.find("topLevel")[0].value = "false";
 		parent(round, parentid);
@@ -336,9 +310,9 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		std::string randomid = id::get("random");
 		bparser::node& random = block(randomid, "operator_random");
 		try { random.find("inputs").push(&parameter_number(sprite, code[0], randomid)).value = "FROM"; }
-		catch (std::exception e) { throw error(0, "from", e); }
+		catch (std::exception& e) { throw error(0, "from", e); }
 		try { random.find("inputs").push(&parameter_number(sprite, code[1], randomid)).value = "TO"; }
-		catch (std::exception e) { throw error(1, "to", e); }
+		catch (std::exception& e) { throw error(1, "to", e); }
 		// Add random block
 		random.find("topLevel")[0].value = "false";
 		parent(random, parentid);
@@ -357,9 +331,9 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		else throw error("Unknown math operator");
 		// Process parameters
 		try { math->find("inputs").push(&parameter_number(sprite, code[0], mathid)).value = "NUM1"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		try { math->find("inputs").push(&parameter_number(sprite, code[1], mathid)).value = "NUM2"; }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 		// Add operator
 		math->find("topLevel")[0].value = "false";
 		parent(*math, parentid);
@@ -371,9 +345,9 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		std::string modid = id::get("mod");
 		bparser::node& mod = block(modid, "operator_mod");
 		try { mod.find("inputs").push(&parameter_number(sprite, code[0], modid)).value = "NUM1"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		try { mod.find("inputs").push(&parameter_number(sprite, code[1], modid)).value = "NUM2"; }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 		// Add mod block
 		mod.find("topLevel")[0].value = "false";
 		parent(mod, parentid);
@@ -391,7 +365,7 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		op.emplace("null");
 		// Parameter
 		try { math.find("inputs").push(&parameter_number(sprite, code[1], mathid)).value = "NUM"; }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 		// Add to sprite
 		math.find("topLevel")[0].value = "false";
 		parent(math, parentid);
@@ -402,49 +376,26 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 	else if (code.value == "translate") {
 		if (code.size() != 2) throw error("Expected 2 parameters");
 		std::string translateid = id::get("translate");
-		bparser::node& translate = block(translateid, "translate_getTranslate");
-		translate.find("topLevel")[0].value = "false";
+		bparser::node& translate = block(translateid, "translate_getTranslate", false);
 		parent(translate, parentid);
 		// Process parameters
 		try { translate.find("inputs").push(&parameter_string(sprite, code[0], translateid)).value = "WORDS"; }
-		catch (std::exception e) { throw error(0, "string", e); }
-		// Add language menu shadow block
-		std::string menuid = id::get("translatelanguage");
-		bparser::node& menu = block(menuid, "translate_menu_languages");
-		menu.find("topLevel")[0].value = "false";
-		menu.find("shadow")[0].value = "true";
-		bparser::node& lang = menu.find("fields").emplace("languages");
-		lang.emplace(code[1].value);
-		lang.emplace("null");
-		// Add shadow block to sprite
-		sprite.find("blocks").push(&menu);
+		catch (std::exception& e) { throw error(0, "string", e); }
+		try { translate.find("inputs").push(&shadow_parameter(sprite, code[1], translateid, "language", "translate_menu_languages", "languages")); }
+		catch (std::exception& e) { throw error(1, "language", e); }
 		// Add block to sprite
 		sprite.find("blocks").push(&translate);
-		node.emplace(translateid);
 	}
 	// Video extention
 	else if (code.value == "video") {
 		if (code.size() != 2) throw error("Expected 2 parameters");
 		std::string videoid = id::get("video");
-		bparser::node& video = block(videoid, "videoSensing_videoOn");
-		video.find("topLevel")[0].value = "false";
+		bparser::node& video = block(videoid, "videoSensing_videoOn", false);
 		parent(video, parentid);
-		// Attribute shadow block
-		std::string attrid = id::get("videoattribute");
-		bparser::node& attr = block(attrid, "videoSensing_menu_ATTRIBUTE", false, true);
-		attr.find("fields").push(field(code[0].value)).value = "ATTRIBUTE";
-		sprite.find("blocks").push(&attr);
-		video.find("inputs").push(shadow(attrid)).value = "ATTRIBUTE";
-		// Subject shadow block
-		std::string subid = id::get("videoattribute");
-		bparser::node& sub = block(subid, "videoSensing_menu_SUBJECT", false, true);
-		std::string subject;
-		if (code[1].value == "sprite") subject = "this sprite";
-		else if (code[1].value == "stage") subject = "Stage";
-		else throw error("Unknown subject (Expected \"sprite\" or \"stage\")");
-		sub.find("fields").push(field(subject)).value = "SUBJECT";
-		sprite.find("blocks").push(&sub);
-		video.find("inputs").push(shadow(subid)).value = "SUBJECT";
+		try { video.find("inputs").push(&shadow_parameter(sprite, code[0], videoid, "videoattribute", "videoSensing_menu_ATTRIBUTE", "ATTRIBUTE")); }
+		catch (std::exception& e) { throw error(0, e); }
+		try { video.find("inputs").push(&shadow_parameter(sprite, code[0], videoid, "videosubject", "videoSensing_menu_SUBJECT", "SUBJECT")); }
+		catch (std::exception& e) { throw error(1, e); }
 		// Add video block
 		sprite.find("blocks").push(&video);
 		node.emplace(videoid);
@@ -459,34 +410,13 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		else if (code.value == "wedo_tilt") tilt = &block(tiltid, "wedo2_getTiltAngle");
 		else if (code.value == "go_tilt") tilt = &block(tiltid, "gdxfor_getTilt");
 		parent(*tilt, parentid);
-		tilt->find("topLevel")[0].value = "false";
-		// Tilt direction select shadow block
-		std::string dirid = id::get("tiltboostdir");
-		bparser::node* dir;
-		if (code.value == "boost_tilt") dir = &block(dirid, "boost_menu_TILT_DIRECTION");
-		else if (code.value == "micro_tilt") dir = &block(dirid, "microbit_menu_tiltDirection");
-		else if (code.value == "wedo_tilt") dir = &block(dirid, "wedo2_menu_TILT_DIRECTION");
-		else if (code.value == "go_tilt") dir = &block(dirid, "gdxfor_menu_tiltOptions");
-		dir->find("topLevel")[0].value = "false";
-		dir->find("shadow")[0].value = "true";
-		parent(*dir, tiltid);
-		// Parameter
-		bparser::node* param;
-		if (code.value == "boost_tilt") param = &dir->find("fields").emplace("TILT_DIRECTION");
-		else if (code.value == "micro_tilt") param = &dir->find("fields").emplace("tiltDirection");
-		else if (code.value == "wedo_tilt") param = &dir->find("fields").emplace("TILT_DIRECTION");
-		else if (code.value == "go_tilt") param = &dir->find("fields").emplace("tiltOptions");
-		param->emplace(code[0].value);
-		param->emplace("null");
-		// Add blocks
-		sprite.find("blocks").push(dir);
-		bparser::node* ref;
-		if (code.value == "boost_tilt") ref = &tilt->find("inputs").emplace("TILT_DIRECTION");
-		else if (code.value == "micro_tilt") ref = &tilt->find("inputs").emplace("DIRECTION");
-		else if (code.value == "wedo_tilt") ref = &tilt->find("inputs").emplace("TILT_DIRECTION");
-		else if (code.value == "go_tilt") ref = &tilt->find("inputs").emplace("TILT");
-		ref->emplace("1");
-		ref->emplace(dirid);
+		try {
+			if (code.value == "boost_tilt") tilt->find("inputs").push(&shadow_parameter(sprite, code[0], tiltid, "tiltmenu", "boost_menu_TILT_DIRECTION", "TILT_DIRECTION"));
+			else if (code.value == "micro_tilt") tilt->find("inputs").push(&shadow_parameter(sprite, code[0], tiltid, "tiltmenu", "microbit_menu_tiltDirection", "tiltDirection")).value = "DIRECTION";
+			else if (code.value == "wedo_tilt") tilt->find("inputs").push(&shadow_parameter(sprite, code[0], tiltid, "tiltmenu", "wedo2_menu_TILT_DIRECTION", "TILT_DIRECTION"));
+			else if (code.value == "go_tilt") tilt->find("inputs").push(&shadow_parameter(sprite, code[0], tiltid, "tiltmenu", "gdxfor_menu_tiltOptions", "tiltOptions")).value = "TILT";
+		}
+		catch (std::exception& e) { throw error(0, "direction", e); }
 		sprite.find("blocks").push(tilt);
 		node.emplace(tiltid);
 	}
@@ -495,31 +425,15 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		if (code.size() != 1) throw error("Expected 1 parameter");
 		std::string motorposid = id::get("motorpos");
 		bparser::node* motorpos;
-		if (code.value == "boost_motorpos") motorpos = &block(motorposid, "boost_getMotorPosition");
-		else if (code.value == "ev3_motorpos") motorpos = &block(motorposid, "ev3_getMotorPosition");
+		if (code.value == "boost_motorpos") motorpos = &block(motorposid, "boost_getMotorPosition", false);
+		else if (code.value == "ev3_motorpos") motorpos = &block(motorposid, "ev3_getMotorPosition", false);
 		parent(*motorpos, parentid);
-		motorpos->find("topLevel")[0].value = "false";
 		// motorpos motor select shadow block
-		std::string motorid = id::get("motor");
-		bparser::node* motor;
-		if (code.value == "boost_motorpos") motor = &block(motorid, "boost_menu_MOTOR_REPORTER_ID");
-		else if (code.value == "ev3_motorpos") motor = &block(motorid, "ev3_menu_motorPorts");
-		motor->find("topLevel")[0].value = "false";
-		motor->find("shadow")[0].value = "true";
-		parent(*motor, motorposid);
-		// Parameter
-		bparser::node* param;
-		if (code.value == "boost_motorpos") param = &motor->find("fields").emplace("MOTOR_REPORTER_ID");
-		else if (code.value == "ev3_motorpos") param = &motor->find("fields").emplace("motorPorts");
-		param->emplace(code[0].value);
-		param->emplace("null");
-		// Add blocks
-		sprite.find("blocks").push(motor);
-		bparser::node* ref;
-		if (code.value == "boost_motorpos") ref = &motorpos->find("inputs").emplace("MOTOR_REPORTER_ID");
-		else if (code.value == "ev3_motorpos") ref = &motorpos->find("inputs").emplace("PORT");
-		ref->emplace("1");
-		ref->emplace(motorid);
+		try {
+			if (code.value == "boost_motorpos") motorpos->find("inputs").push(&shadow_parameter(sprite, code[0], motorposid, "motor", "boost_menu_MOTOR_REPORTER_ID", "MOTOR_REPORTER_ID"));
+			else if (code.value == "ev3_motorpos") motorpos->find("inputs").push(&shadow_parameter(sprite, code[0], motorposid, "motor", "ev3_menu_motorPorts", "motorPorts")).value = "PORT";
+		}
+		catch (std::exception& e) { throw error(0, "motor", e); }
 		sprite.find("blocks").push(motorpos);
 		node.emplace(motorposid);
 	}
@@ -538,7 +452,7 @@ bparser::node& parameter_string(bparser::node& sprite, bparser::node& code, std:
 	else {
 		node.emplace("3");
 		try { parameter_generic(sprite, code, node, parentid); }
-		catch (std::exception e) { throw error(code.value, e); }
+		catch (std::exception& e) { throw error(code.value, e); }
 		// Default
 		bparser::node& hidden = node.emplace("");
 		hidden.emplace("10");
@@ -574,7 +488,7 @@ bparser::node& parameter_number(bparser::node& sprite, bparser::node& code, std:
 	else {
 		node.emplace("3");
 		try { parameter_generic(sprite, code, node, parentid); }
-		catch (std::exception e) { throw error(code.value, e); }
+		catch (std::exception& e) { throw error(code.value, e); }
 		// Default
 		bparser::node& hidden = node.emplace("");
 		if (!positive && !integer) hidden.emplace("4");
@@ -596,55 +510,55 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 		if (code.size() != 2) throw error("Expected 2 parameters");
 		boolean = &block(id::get("and"), "operator_and");
 		try { boolean->find("inputs").push(&parameter_bool(sprite, code[0], boolean->value)).value = "OPERAND1"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		try { boolean->find("inputs").push(&parameter_bool(sprite, code[1], boolean->value)).value = "OPERAND2"; }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 	}
 	else if (code.value == "or") {
 		if (code.size() != 2) throw error("Expected 2 parameters");
 		boolean = &block(id::get("or"), "operator_or");
 		try { boolean->find("inputs").push(&parameter_bool(sprite, code[0], boolean->value)).value = "OPERAND1"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		try { boolean->find("inputs").push(&parameter_bool(sprite, code[1], boolean->value)).value = "OPERAND2"; }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 	}
 	else if (code.value == "not") {
-		if (code.size() != 2) throw error("Expected 2 parameters");
+		if (code.size() != 1) throw error("Expected 1 parameter");
 		boolean = &block(id::get("or"), "operator_or");
 		try { boolean->find("inputs").push(&parameter_bool(sprite, code[0], boolean->value)).value = "OPERAND"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 	}
 	else if (code.value == "=") {
 		if (code.size() != 2) throw error("Expected 2 parameters");
 		boolean = &block(id::get("equals"), "operator_equals");
 		try { boolean->find("inputs").push(&parameter_string(sprite, code[0], boolean->value)).value = "OPERAND1"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		try { boolean->find("inputs").push(&parameter_string(sprite, code[1], boolean->value)).value = "OPERAND2"; }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 	}
 	else if (code.value == ">") {
 		if (code.size() != 2) throw error("Expected 2 parameters");
 		boolean = &block(id::get("equals"), "operator_gt");
 		try { boolean->find("inputs").push(&parameter_string(sprite, code[0], boolean->value)).value = "OPERAND1"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		try { boolean->find("inputs").push(&parameter_string(sprite, code[1], boolean->value)).value = "OPERAND2"; }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 	}
 	else if (code.value == "<") {
 		if (code.size() != 2) throw error("Expected 2 parameters");
 		boolean = &block(id::get("equals"), "operator_lt");
 		try { boolean->find("inputs").push(&parameter_string(sprite, code[0], boolean->value)).value = "OPERAND1"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		try { boolean->find("inputs").push(&parameter_string(sprite, code[1], boolean->value)).value = "OPERAND2"; }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 	}
 	else if (code.value == "contains") {
 		if (code.size() != 2) throw error("Expected 2 parameters");
 		boolean = &block(id::get("equals"), "operator_contains");
 		try { boolean->find("inputs").push(&parameter_string(sprite, code[0], boolean->value)).value = "STRING1"; }
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		try { boolean->find("inputs").push(&parameter_string(sprite, code[1], boolean->value)).value = "STRING2"; }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 	}
 	else if (code.value == "list_contains") {
 		if (code.size() != 2) throw error("Expected 2 parameters");
@@ -654,9 +568,9 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 			list.emplace(code[0].value);
 			list.emplace(find_list(sprite, code[0].value));
 		}
-		catch (std::exception e) { throw error(0, e); }
+		catch (std::exception& e) { throw error(0, e); }
 		try { boolean->find("inputs").push(&parameter_string(sprite, code[1], boolean->value)).value = "ITEM"; }
-		catch (std::exception e) { throw error(1, e); }
+		catch (std::exception& e) { throw error(1, e); }
 	}
 	// Sensing
 	else if (code.value == "mouse_down") {
@@ -667,33 +581,19 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 		if (code.size() != 1) throw error("Expected 1 parameter");
 		boolean = &block(id::get("pressed"), "sensing_keypressed", false);
 		// Process parameter
-		bparser::node& option = boolean->find("inputs").emplace("KEY_OPTION");
-		option.emplace("1");
-		std::string keyid = id::get("key");
-		option.emplace(keyid);
-		// Create shadow block
-		bparser::node& key = block(keyid, "sensing_keyoptions", false, true);
-		parent(key, boolean->value);
-		bparser::node& field = key.find("fields").emplace("KEY_OPTION");
-		field.emplace(code[0].value).string = true;
-		field.emplace("null");
-		sprite.find("blocks").push(&key);
+		try {
+			boolean->find("inputs").push(&shadow_parameter(sprite, code[0], boolean->value, "key", "sensing_keyoptions", "KEY_OPTION"));
+		}
+		catch (std::exception& e) { throw error(0, "key", e); }
 	}
 	else if (code.value == "touching") {
 		if (code.size() != 1) throw error("Expected 1 parameter");
 		boolean = &block(id::get("touching"), "sensing_touchingobject", false);
 		// Process parameter
-		bparser::node& option = boolean->find("inputs").emplace("TOUCHINGOBJECTMENU");
-		option.emplace("1");
-		std::string touchid = id::get("touch");
-		option.emplace(touchid);
-		// Create shadow block
-		bparser::node& touch = block(touchid, "sensing_touchingobjectmenu", false, true);
-		parent(touch, boolean->value);
-		bparser::node& field = touch.find("fields").emplace("TOUCHINGOBJECTMENU");
-		field.emplace(code[0].value).string = true;
-		field.emplace("null");
-		sprite.find("blocks").push(&touch);
+		try {
+			boolean->find("inputs").push(&shadow_parameter(sprite, code[0], boolean->value, "touch", "sensing_touchingobjectmenu", "TOUCHINGOBJECTMENU"));
+		}
+		catch (std::exception& e) { throw error(0, "sprite", e); }
 	}
 	// Extensions
 	else if (code.value == "go_falling") {
@@ -708,4 +608,27 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 	sprite.find("blocks").push(boolean);
 
 	return node;
+}
+
+bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std::string parentid, std::string name, std::string opcode, std::string field) {
+	bool param = (code.size() == 0) ? false : true;
+	bparser::node& input = *(new bparser::node(field));
+	input.emplace(((param) ? "3" : "1"));
+	if (param) {
+		try {
+			bparser::node& parameter = input.emplace("");
+			parameter_generic(sprite, code, parameter, parentid);
+		}
+		catch (std::exception& e) {
+			throw error(name, e);
+		}
+	}
+	bparser::node& shadow = block(id::get(name), opcode, false, true);
+	parent(shadow, parentid);
+	bparser::node& shadowfield = shadow.find("fields").emplace(field);
+	shadowfield.emplace((param) ? "lascra" : code.value).string = true;
+	shadowfield.emplace("null");
+	sprite.find("blocks").push(&shadow);
+	input.emplace(shadow.value);
+	return input;
 }

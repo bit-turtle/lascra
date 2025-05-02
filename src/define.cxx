@@ -47,11 +47,12 @@ void broadcast(bparser::node& sprite, bparser::node& code) {
 
 void define(bparser::node& sprite, bparser::node& code) {
 	for (int i = 0; i < code.size(); i++) {
+		if (code[i].value == "#") continue;
 		if (code[i].value == "variable") {
 			try {
 				variable(sprite, code[i]);
 			}
-			catch (std::exception e) {
+			catch (std::exception& e) {
 				throw error(i, "variable", e);
 			}
 		}
@@ -59,7 +60,7 @@ void define(bparser::node& sprite, bparser::node& code) {
 			try {
 				list(sprite, code[i]);
 			}
-			catch (std::exception e) {
+			catch (std::exception& e) {
 				throw error(i, "list", e);
 			}
 		}
@@ -67,7 +68,7 @@ void define(bparser::node& sprite, bparser::node& code) {
 			try {
 				broadcast(sprite, code[i]);
 			}
-			catch (std::exception e) {
+			catch (std::exception& e) {
 				throw error(i, "broadcast", e);
 			}
 		}

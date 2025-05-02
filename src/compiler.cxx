@@ -14,11 +14,12 @@
 
 void compile(bparser::node& sprite, bparser::node& code) {
 	for (int i = 0; i < code.size(); i++) {
+		if (code[i].value == "#") continue;
 		if (code[i].value == "declare") {
 			try {
 				declare(sprite, code[i]);
 			}
-			catch (std::exception e) {
+			catch (std::exception& e) {
 				throw error(i, "declare", e);
 			}
 		}
@@ -26,7 +27,7 @@ void compile(bparser::node& sprite, bparser::node& code) {
 			try {
 				define(sprite, code[i]);
 			}
-			catch (std::exception e) {
+			catch (std::exception& e) {
 				throw error(i, "define", e);
 			}
 		}
@@ -34,7 +35,7 @@ void compile(bparser::node& sprite, bparser::node& code) {
 			try {
 				when(sprite, code[i]);
 			}
-			catch (std::exception e) {
+			catch (std::exception& e) {
 				throw error(i, "when", e);
 			}
 		}

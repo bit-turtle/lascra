@@ -1,0 +1,9 @@
+(declare
+	(name "Comment Example")
+)
+(when flag
+	(# Ask the user for input)
+	(ask "What is your favorite animal?")
+	(# Say that the animal is cool)
+	(say (join (value answer) " are cool!") )
+)

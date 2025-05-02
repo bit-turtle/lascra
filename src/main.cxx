@@ -38,6 +38,11 @@ int main(int argc, char* argv[]) {
 		.store_into(display)
 		.help("display generated sprite json");
 
+	bool list = false;
+	lascra.add_argument("-l", "--list")
+		.store_into(list)
+		.help("list generated blocks, variables, lists, and broadcasts");
+
 	std::string spritename;
 	lascra.add_argument("-s", "--sprite")
 		.store_into(spritename)
@@ -54,7 +59,7 @@ int main(int argc, char* argv[]) {
 	catch (std::exception& err) {
 		std::cout << err.what() << std::endl;
 		std::cout << lascra << std::endl;
-		return EXIT_FAILURE;
+		return EXIT_SUCCESS;
 	}
 
 	std::vector<std::string> files;
@@ -163,6 +168,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Compile files
+	id::reset();
 	if (files.size() == 0) {
 		std::cout
 			<< "Error: No code files!" << std::endl;
@@ -183,12 +189,23 @@ int main(int argc, char* argv[]) {
 		try {
 			compile(sprite, code);
 		}
-		catch (std::exception e) {
+		catch (std::exception& e) {
 			std::cout << "Compile Error: " << filename << ":" << e.what() << std::endl;
 			return EXIT_FAILURE;
 		}
 	}
 	std::cout << "Compiled all files!" << std::endl;
+
+	if (list) {
+		std::cout << "Broadcasts:" << std::endl;
+		sprite.find("broadcasts").display("  ", "- ");
+		std::cout << "Variables:" << std::endl;
+		sprite.find("variables").display("  ", "- ");
+		std::cout << "Lists:" << std::endl;
+		sprite.find("lists").display("  ", "- ");
+		std::cout << "Blocks:" << std::endl;
+		sprite.find("blocks").display("  ", "- ");
+	}
 
 	// Clear broadcast list if not Stage (Scratch broadcasts don't work otherwise)
 	if (sprite.find("isStage")[0].value != "true")

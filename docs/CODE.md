@@ -59,7 +59,7 @@ Here `say` is a block which accepts a string parameter as an input `PARAM.md`
 * (stop *what*)
   - Same as scratch, example: `(stop all)`
 * (clone *spriteName*)
-  - Myself is: "_myself_"
+  - Myself is: `_myself_`
   - `(clone _myself_)`
 * (delete_clone)
   - Can also be written without parentheses
@@ -68,3 +68,5 @@ Here `say` is a block which accepts a string parameter as an input `PARAM.md`
 * (change *variableName* *number*)
 * (show_variable *variableName*)
 * (hide_variable *variableName*)
+* (show_list *listName*)
+* (hide_list *listName*)

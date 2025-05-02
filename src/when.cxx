@@ -55,7 +55,7 @@ void when(bparser::node& sprite, bparser::node& params) {
 		bparser::node& broadcast = event->find("fields").emplace("BROADCAST_OPTION");
 		broadcast.emplace(params[0][0].value).string = true;
 		try { broadcast.emplace(find_broadcast(sprite, params[0][0].value)); }
-		catch (std::exception e) { throw error("received", e); }
+		catch (std::exception& e) { throw error("received", e); }
 	}
 	else if (params[0].value == "loudness" || params[0].value == "timer") {
 		if (params[0].size() != 1) throw error("Expected 1 parameter");
@@ -65,7 +65,7 @@ void when(bparser::node& sprite, bparser::node& params) {
 		greater.emplace((params[0].value == "loudness") ? "LOUDNESS" : "TIMER");
 		greater.emplace("null");
 		try { event->find("inputs").push(&parameter_string(sprite, params[0][0], eventid)).value = "VALUE"; }
-		catch (std::exception e) { throw error(params[0].value, e); }
+		catch (std::exception& e) { throw error(params[0].value, e); }
 	}
 	sprite.find("blocks").push(event);
 	// Code in event

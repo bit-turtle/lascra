@@ -1,8 +1,0 @@
-(define
-	(variable test)
-	(variable test)
-	(broadcast wow)
-)
-(when (received wow)
-	(say wow)
-)

@@ -17,6 +17,7 @@ std::string substack(bparser::node& sprite, bparser::node& param, int offset, st
 	std::string previd = parentid;
 	for (int i = offset; i < param.size(); i++) {
 		try {
+			if (param[i].value == "#") continue;
 			std::string nextid = code(sprite, param[i], previf);
 			if (param[i].value != "else" && param[i].value != "elif") {
 				next(*prevnode, nextid);
@@ -34,7 +35,7 @@ std::string substack(bparser::node& sprite, bparser::node& param, int offset, st
 			}
 			if (i == offset) startid = nextid;
 		}
-		catch (std::exception e) { throw error(i, e); }
+		catch (std::exception& e) { throw error(i, e); }
 	}
 
 	return startid;
@@ -101,17 +102,7 @@ std::string goto_pos(bparser::node& sprite, bparser::node& param) {
 	std::string id = id::get("goto");
 	bparser::node& goto_pos = block(id, "motion_goto", false);
 	sprite.find("blocks").push(&goto_pos);
-	bparser::node& option = goto_pos.find("inputs").emplace("TO");
-	option.emplace("1");
-	// Shadow block
-	std::string menuid = id::get("goto_posmenu");
-	bparser::node& goto_posmenu = block(menuid, "motion_goto_menu", false, true);
-	parent(goto_posmenu, id);
-	bparser::node& menuoption = goto_posmenu.find("fields").emplace("TO");
-	menuoption.emplace(param[0].value).string = true;
-	menuoption.emplace("null");
-	sprite.find("blocks").push(&goto_posmenu);
-	option.emplace(menuid);
+	goto_pos.find("inputs").push(&shadow_parameter(sprite, param[0], id, "goto", "motion_goto_menu", "TO"));
 	return id;
 }
 std::string goto_xy(bparser::node& sprite, bparser::node& code) {
@@ -129,17 +120,7 @@ std::string glide_pos(bparser::node& sprite, bparser::node& param) {
 	bparser::node& glide_pos = block(id, "motion_glideto", false);
 	glide_pos.find("inputs").push(&parameter_number(sprite, param[0], id)).value = "SECS";
 	sprite.find("blocks").push(&glide_pos);
-	bparser::node& option = glide_pos.find("inputs").emplace("TO");
-	option.emplace("1");
-	// Shadow block
-	std::string menuid = id::get("glide_posmenu");
-	bparser::node& glide_posmenu = block(menuid, "motion_glideto_menu", false, true);
-	parent(glide_posmenu, id);
-	bparser::node& menuoption = glide_posmenu.find("fields").emplace("TO");
-	menuoption.emplace(param[1].value).string = true;
-	menuoption.emplace("null");
-	sprite.find("blocks").push(&glide_posmenu);
-	option.emplace(menuid);
+	glide_pos.find("inputs").push(&shadow_parameter(sprite, param[0], id, "goto", "motion_goto_menu", "TO"));
 	return id;
 }
 std::string glide_xy(bparser::node& sprite, bparser::node& code) {
@@ -165,17 +146,7 @@ std::string point_towards(bparser::node& sprite, bparser::node& param) {
 	std::string id = id::get("towards");
 	bparser::node& towards = block(id, "motion_pointtowards", false);
 	sprite.find("blocks").push(&towards);
-	bparser::node& option = towards.find("inputs").emplace("TOWARDS");
-	option.emplace("1");
-	// Shadow block
-	std::string menuid = id::get("towardsmenu");
-	bparser::node& towardsmenu = block(menuid, "motion_pointtowards_menu", false, true);
-	parent(towardsmenu, id);
-	bparser::node& menuoption = towardsmenu.find("fields").emplace("TOWARDS");
-	menuoption.emplace(param[0].value).string = true;
-	menuoption.emplace("null");
-	sprite.find("blocks").push(&towardsmenu);
-	option.emplace(menuid);
+	towards.find("inputs").push(&shadow_parameter(sprite, param[0], id, "towardsmenu", "motion_pointtowards_menu", "TOWARDS"));
 	return id;
 }
 std::string if_on_edge_bounce(bparser::node& sprite, bparser::node& code) {
@@ -237,16 +208,7 @@ std::string costume(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 1) throw error("Expected 1 parameter");
 	std::string id = id::get("costume");
 	bparser::node& costume = block(id, "looks_switchcostumeto", false);
-	// Shadow Block
-	bparser::node& shadow = block(id::get("costumename"), "looks_costume", false, true);
-	bparser::node& name = shadow.find("fields").emplace("COSTUME");
-	name.emplace(code[0].value).string = true;
-	name.emplace("null");
-	sprite.find("blocks").push(&shadow);
-	// Add to block
-	bparser::node& ref = costume.find("inputs").emplace("COSTUME");
-	ref.emplace("1");
-	ref.emplace(shadow.value);
+	costume.find("inputs").push(&shadow_parameter(sprite, code[0], id, "costume", "looks_costume", "COSTUME"));
 	sprite.find("blocks").push(&costume);
 	return id;
 }
@@ -254,16 +216,7 @@ std::string backdrop(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 1) throw error("Expected 1 parameter");
 	std::string id = id::get("backdrop");
 	bparser::node& backdrop = block(id, "looks_switchbackdropto", false);
-	// Shadow Block
-	bparser::node& shadow = block(id::get("backdropname"), "looks_backdrop", false, true);
-	bparser::node& name = shadow.find("fields").emplace("backdrop");
-	name.emplace(code[0].value).string = true;
-	name.emplace("null");
-	sprite.find("blocks").push(&shadow);
-	// Add to block
-	bparser::node& ref = backdrop.find("inputs").emplace("backdrop");
-	ref.emplace("1");
-	ref.emplace(shadow.value);
+	backdrop.find("inputs").push(&shadow_parameter(sprite, code[0], id, "backdrop", "looks_backdrops", "BACKDROP"));
 	sprite.find("blocks").push(&backdrop);
 	return id;
 }
@@ -297,6 +250,63 @@ std::string set_size(bparser::node& sprite, bparser::node& code) {
 	sprite.find("blocks").push(&set_size);
 	return id;
 }
+std::string change_effect(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 2) throw error("Expected 2 parameters");
+	std::string id = id::get("changeeffect");
+	bparser::node& change_effect = block(id, "looks_changeeffectby", false);
+	bparser::node& effect = change_effect.find("fields").emplace("EFFECT");
+	if (code[0].value == "color") effect.emplace("COLOR");
+	else if (code[0].value == "fisheye") effect.emplace("FISHEYE");
+	else if (code[0].value == "whirl") effect.emplace("WHIRL");
+	else if (code[0].value == "pixelate") effect.emplace("PIXELATE");
+	else if (code[0].value == "mosaic") effect.emplace("MOSAIC");
+	else if (code[0].value == "brightness") effect.emplace("BRIGHTNESS");
+	else if (code[0].value == "ghost") effect.emplace("GHOST");
+	else throw error("Not a valid effect name");
+	effect.emplace("null");
+	change_effect.find("inputs").push(&parameter_number(sprite, code[1], id)).value = "CHANGE";
+	sprite.find("blocks").push(&change_effect);
+	return id;
+}
+std::string set_effect(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 2) throw error("Expected 2 parameters");
+	std::string id = id::get("seteffect");
+	bparser::node& set_effect = block(id, "looks_seteffectto", false);
+	bparser::node& effect = set_effect.find("fields").emplace("EFFECT");
+	if (code[0].value == "color") effect.emplace("COLOR");
+	else if (code[0].value == "fisheye") effect.emplace("FISHEYE");
+	else if (code[0].value == "whirl") effect.emplace("WHIRL");
+	else if (code[0].value == "pixelate") effect.emplace("PIXELATE");
+	else if (code[0].value == "mosaic") effect.emplace("MOSAIC");
+	else if (code[0].value == "brightness") effect.emplace("BRIGHTNESS");
+	else if (code[0].value == "ghost") effect.emplace("GHOST");
+	else throw error("Not a valid effect name");
+	effect.emplace("null");
+	set_effect.find("inputs").push(&parameter_number(sprite, code[1], id)).value = "VALUE";
+	sprite.find("blocks").push(&set_effect);
+	return id;
+}
+std::string clear_effects(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 0) throw error("Expected no parameters");
+	std::string id = id::get("cleareffects");
+	bparser::node& cleareffects = block(id, "looks_cleargraphiceffects", false);
+	sprite.find("blocks").push(&cleareffects);
+	return id;
+}
+std::string show(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 0) throw error("Expected no parameters");
+	std::string id = id::get("show");
+	bparser::node& show = block(id, "looks_show", false);
+	sprite.find("blocks").push(&show);
+	return id;
+}
+std::string hide(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 0) throw error("Expected no parameters");
+	std::string id = id::get("hide");
+	bparser::node& hide = block(id, "looks_hide", false);
+	sprite.find("blocks").push(&hide);
+	return id;
+}
 // Control
 std::string wait(bparser::node& sprite, bparser::node& param) {
 	if (param.size() != 1) throw error("Expected 1 parameter");
@@ -307,9 +317,9 @@ std::string wait(bparser::node& sprite, bparser::node& param) {
 	return id;
 }
 std::string wait_until(bparser::node& sprite, bparser::node& param) {
-	if (param.size() == 1) throw error("Expected 1 parameter");
+	if (param.size() != 1) throw error("Expected 1 parameter");
 	std::string id = id::get("wait");
-	bparser::node& wait = block(id, "control_wait", false);
+	bparser::node& wait = block(id, "control_wait_until", false);
 	wait.find("inputs").push(&parameter_bool(sprite, param[0], id)).value = "CONDITION";
 	sprite.find("blocks").push(&wait);
 	return id;
@@ -410,21 +420,7 @@ std::string forever(bparser::node& sprite, bparser::node& param) {
 	return id;
 }
 // Events
-std::string broadcast(bparser::node& sprite, bparser::node& code) {
-	if (code.size() != 1) throw error("Expected 1 parameter");
-	std::string id = id::get("move");
-	bparser::node& broadcast = block(id, "event_broadcast", false);
-	bparser::node& input = broadcast.find("inputs").emplace("BROADCAST_INPUT");
-	input.emplace("1");
-	bparser::node& broadcastinput = input.emplace("");
-	broadcastinput.emplace("11");
-	broadcastinput.emplace(code[0].value).string = true;
-	broadcastinput.emplace(find_broadcast(sprite, code[0].value));
-	broadcast.find("inputs").push(&parameter_string(sprite, code[0], id)).value = "VALUE";
-	sprite.find("blocks").push(&broadcast);
-	return id;
-}
-std::string broadcast_wait(bparser::node& sprite, bparser::node& code) {
+std::string send_broadcast(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 1) throw error("Expected 1 parameter");
 	std::string id = id::get("move");
 	bparser::node& broadcast = block(id, "event_broadcastandwait", false);
@@ -433,7 +429,7 @@ std::string broadcast_wait(bparser::node& sprite, bparser::node& code) {
 	bparser::node& broadcastinput = input.emplace("");
 	broadcastinput.emplace("11");
 	broadcastinput.emplace(code[0].value).string = true;
-	broadcastinput.emplace(find_broadcast(sprite, code[0].value));
+	// broadcastinput.emplace(find_broadcast(sprite, code[0].value));
 	broadcast.find("inputs").push(&parameter_string(sprite, code[0], id)).value = "VALUE";
 	sprite.find("blocks").push(&broadcast);
 	return id;
@@ -453,17 +449,7 @@ std::string clone(bparser::node& sprite, bparser::node& param) {
 	std::string id = id::get("clone");
 	bparser::node& clone = block(id, "control_create_clone_of", false);
 	sprite.find("blocks").push(&clone);
-	bparser::node& option = clone.find("inputs").emplace("CLONE_OPTION");
-	option.emplace("1");
-	// Shadow block
-	std::string menuid = id::get("clonemenu");
-	bparser::node& clonemenu = block(menuid, "control_create_clone_of_menu", false, true);
-	parent(clonemenu, id);
-	bparser::node& menuoption = clonemenu.find("fields").emplace("CLONE_OPTION");
-	menuoption.emplace(param[0].value).string = true;
-	menuoption.emplace("null");
-	sprite.find("blocks").push(&clonemenu);
-	option.emplace(menuid);
+	clone.find("inputs").push(&shadow_parameter(sprite, param[0], id, "clonemenu", "control_create_clone_of_menu", "CLONE_OPTION"));
 	return id;
 }
 std::string delete_clone(bparser::node& sprite, bparser::node& code) {
@@ -476,7 +462,7 @@ std::string delete_clone(bparser::node& sprite, bparser::node& code) {
 // Data
 std::string set(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 2) throw error("Expected 2 parameters");
-	std::string id = id::get("move");
+	std::string id = id::get("set");
 	bparser::node& set = block(id, "data_setvariableto", false);
 	bparser::node& variable = set.find("fields").emplace("VARIABLE");
 	variable.emplace(code[0].value);
@@ -487,7 +473,7 @@ std::string set(bparser::node& sprite, bparser::node& code) {
 }
 std::string change(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 2) throw error("Expected 2 parameters");
-	std::string id = id::get("move");
+	std::string id = id::get("change");
 	bparser::node& change = block(id, "data_changevariableby", false);
 	bparser::node& variable = change.find("fields").emplace("VARIABLE");
 	variable.emplace(code[0].value);
@@ -496,31 +482,88 @@ std::string change(bparser::node& sprite, bparser::node& code) {
 	sprite.find("blocks").push(&change);
 	return id;
 }
-std::string show_variable(bparser::node& sprite, bparser::node& code) {
+// add item to list
+std::string add(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 2) throw error("Expected 2 parameters");
+	std::string id = id::get("add");
+	bparser::node& add = block(id, "data_addtolist", false);
+	add.find("inputs").push(&parameter_string(sprite, code[0], id)).value = "ITEM";
+	bparser::node& list = add.find("fields").emplace("LIST");
+	list.emplace(code[1].value);
+	list.emplace(find_list(sprite, code[1].value));
+	sprite.find("blocks").push(&add);
+	return id;
+}
+std::string delete_at(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 2) throw error("Expected 2 parameters");
+	std::string id = id::get("delete");
+	bparser::node& deleteat = block(id, "data_deleteoflist", false);
+	deleteat.find("inputs").push(&parameter_number(sprite, code[0], id, true, true)).value = "INDEX";
+	bparser::node& list = deleteat.find("fields").emplace("LIST");
+	list.emplace(code[1].value);
+	list.emplace(find_list(sprite, code[1].value));
+	sprite.find("blocks").push(&deleteat);
+	return id;
+}
+std::string delete_all(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 1) throw error("Expected 1 parameter");
+	std::string id = id::get("deleteallall");
+	bparser::node& deleteall = block(id, "data_deletealloflist", false);
+	bparser::node& list = deleteall.find("fields").emplace("LIST");
+	list.emplace(code[0].value);
+	list.emplace(find_list(sprite, code[0].value));
+	sprite.find("blocks").push(&deleteall);
+	return id;
+}
+std::string insert(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 3) throw error("Expected 3 parameters");
+	std::string id = id::get("insert");
+	bparser::node& insert = block(id, "data_insertatlist", false);
+	insert.find("inputs").push(&parameter_string(sprite, code[0], id)).value = "ITEM";
+	insert.find("inputs").push(&parameter_number(sprite, code[1], id, true, true)).value = "INDEX";
+	bparser::node& list = insert.find("fields").emplace("LIST");
+	list.emplace(code[2].value);
+	list.emplace(find_list(sprite, code[2].value));
+	sprite.find("blocks").push(&insert);
+	return id;
+}
+std::string replace(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 3) throw error("Expected 3 parameters");
+	std::string id = id::get("replace");
+	bparser::node& replace = block(id, "data_insertatlist", false);
+	replace.find("inputs").push(&parameter_number(sprite, code[0], id, true, true)).value = "INDEX";
+	bparser::node& list = replace.find("fields").emplace("LIST");
+	list.emplace(code[1].value);
+	list.emplace(find_list(sprite, code[1].value));
+	replace.find("inputs").push(&parameter_string(sprite, code[2], id)).value = "ITEM";
+	sprite.find("blocks").push(&replace);
+	return id;
+}
+std::string show_data(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 1) throw error("Expected 1 parameter1");
 	bool list;
-	if (code[0].value == "variable") list = false;
-	else if (code[0].value == "list") list = true;
+	if (code.value == "show_variable") list = false;
+	else if (code.value == "show_list") list = true;
 	else throw error("Expected \"variable\" or \"list\"");
-	std::string id = id::get("move");
+	std::string id = id::get("showdata");
 	bparser::node& show = block(id, list ? "data_showlist" : "data_showvariable", false);
 	bparser::node& variable = show.find("fields").emplace(list ? "LIST" : "VARIABLE");
-	variable.emplace(code[1].value);
-	variable.emplace(list ? find_list(sprite, code[1].value) : find_variable(sprite, code[1].value));
+	variable.emplace(code[0].value);
+	variable.emplace(list ? find_list(sprite, code[0].value) : find_variable(sprite, code[0].value));
 	sprite.find("blocks").push(&show);
 	return id;
 }
-std::string hide_variable(bparser::node& sprite, bparser::node& code) {
-	if (code.size() != 2) throw error("Expected 2 parameters");
+std::string hide_data(bparser::node& sprite, bparser::node& code) {
+	if (code.size() != 1) throw error("Expected 1 parameter");
 	bool list;
-	if (code[0].value == "variable") list = false;
-	else if (code[0].value == "list") list = true;
+	if (code.value == "hide_variable") list = false;
+	else if (code.value == "hide_list") list = true;
 	else throw error("Expected \"variable\" or \"list\"");
-	std::string id = id::get("move");
+	std::string id = id::get("hidedata");
 	bparser::node& hide = block(id, list ? "data_hidelist" : "data_hidevariable", false);
 	bparser::node& variable = hide.find("fields").emplace(list ? "LIST" : "VARIABLE");
-	variable.emplace(code[1].value);
-	variable.emplace(list ? find_list(sprite, code[1].value) : find_variable(sprite, code[1].value));
+	variable.emplace(code[0].value);
+	variable.emplace(list ? find_list(sprite, code[0].value) : find_variable(sprite, code[0].value));
 	sprite.find("blocks").push(&hide);
 	return id;
 }
@@ -530,7 +573,7 @@ std::string ask(bparser::node& sprite, bparser::node& param) {
 	std::string id = id::get("ask");
 	bparser::node& ask = block(id, "sensing_askandwait", false);
 	try { ask.find("inputs").push(&parameter_string(sprite, param[0], id)).value = "QUESTION"; }
-	catch (std::exception e) { throw error("question", e); }
+	catch (std::exception& e) { throw error("question", e); }
 	sprite.find("blocks").push(&ask);
 	return id;
 }
@@ -567,9 +610,13 @@ std::string code(bparser::node& sprite, bparser::node& code, bparser::node* prev
 		else if (code.value == "next_backdrop") return next_backdrop(sprite, code);
 		else if (code.value == "change_size") return change_size(sprite, code);
 		else if (code.value == "set_size") return set_size(sprite, code);
+		else if (code.value == "change_effect") return change_effect(sprite, code);
+		else if (code.value == "set_effect") return set_effect(sprite, code);
+		else if (code.value == "clear_effects") return clear_effects(sprite, code);
+		else if (code.value == "show") return show(sprite, code);
+		else if (code.value == "hide") return hide(sprite, code);
 		// Events
-		else if (code.value == "broadcast") return broadcast(sprite, code);
-		else if (code.value == "broadcast_wait") return broadcast_wait(sprite, code);
+		else if (code.value == "broadcast" || code.value == "broadcast_wait") return send_broadcast(sprite, code);
 		// Control
 		else if (code.value == "wait") return wait(sprite, code);
 		else if (code.value == "wait_until") return wait_until(sprite, code);
@@ -585,13 +632,18 @@ std::string code(bparser::node& sprite, bparser::node& code, bparser::node* prev
 		// Data
 		else if (code.value == "set") return set(sprite, code);
 		else if (code.value == "change") return change(sprite, code);
-		else if (code.value == "show_variable") return show_variable(sprite, code);
-		else if (code.value == "hide_variable") return hide_variable(sprite, code);
+		else if (code.value == "add") return add(sprite, code);
+		else if (code.value == "delete") return delete_at(sprite, code);
+		else if (code.value == "delete_all") return delete_all(sprite, code);
+		else if (code.value == "insert") return insert(sprite, code);
+		else if (code.value == "replace") return replace(sprite, code);
+		else if (code.value == "show_variable" || code.value == "show_list") return show_data(sprite, code);
+		else if (code.value == "hide_variable" || code.value == "hide_list") return hide_data(sprite, code);
 		// Sensing
 		else if (code.value == "ask") return ask(sprite, code);
 		else throw error("Unknown command");
 	}
-	catch (std::exception e) {
+	catch (std::exception& e) {
 		throw error(code.value, e);
 	}
 }

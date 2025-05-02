@@ -2,7 +2,7 @@
     (name MySprite)
 )
 (define
-    (variable counter 0)
+	(variable counter 0)
 )
 (when flag
     (say "Hello, World!")

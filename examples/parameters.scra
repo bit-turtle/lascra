@@ -7,4 +7,6 @@
 (when flag
 	(say (join "Value of MyVariable: " (variable MyVariable) ) )
 	(say (join "2+2=" (+ 2 2) ) )
+	(ask "What color is the sky?")
+	(say (join "That is " (bool (= (value answer) "blue") ) ) )
 )

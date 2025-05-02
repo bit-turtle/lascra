@@ -150,9 +150,10 @@ void declaration(bparser::node& sprite, bparser::node& code) {
 void declare(bparser::node& sprite, bparser::node& code) {
 	for (int i = 0; i < code.size(); i++) {
 		try {
+			if (code[i].value == "#") continue;
 			declaration(sprite, code[i]);
 		}
-		catch (std::exception e) {
+		catch (std::exception& e) {
 			throw error(i, code[i].value, e);
 		}
 	}
