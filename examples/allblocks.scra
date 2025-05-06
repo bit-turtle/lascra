@@ -77,6 +77,11 @@
 	)
 	(clone _myself_)
 
+  (# Sensing Category)
+  (ask "What is your name?")
+  (reset_timer)
+  (draggable true)
+
 	(# Data Category )
 	(set variable1 5)
 	(change variable1 1)

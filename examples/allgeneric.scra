@@ -1,0 +1,41 @@
+(declare
+  (name "All Generic Parameters")
+)
+(define
+  (variable MyVariable "lascra")
+  (list MyList
+    1
+    "lascra"
+    3
+  )
+)
+(when flag
+  (say (bool (= 1 1) ) )
+  (say (variable MyVariable) )
+  (say (list MyList) )
+  (say (size MyList) )
+  (say (item 2 MyList) )
+  (say (item# "lascra" MyList) )
+
+  (# Values)
+  (say (value x) )
+  (say (value y) )
+  (say (value direction) )
+  (say (value size) )
+  (say (value volume) )
+  (say (value mouse_x) )
+  (say (value mouse_y) )
+  (say (value answer) )
+  (say (value loudness) )
+  (say (value timer) )
+  (say (value days_since_2000) )
+  (say (value username) )
+
+  (# Extentions)
+  (say (value music_tempo) )
+  (say (value translate_language) )
+  (say (value ev3_distance) )
+  (say (value ev3_brightness) )
+  (say (value wedo_distance) )
+  (say (value go_force) )
+)

@@ -1,0 +1,30 @@
+(declare
+  (name "All Boolean Blocks")
+)
+(define
+  (list MyList
+    thing
+    lascra
+    wow
+  )
+)
+(when flag
+  (# I am using (= 1 1) as a placeholder for boolean inputs )
+  (say (bool (and (= 1 1) (= 1 1) ) ) )
+  (say (bool (or (= 1 1) (= 1 1) ) ) )
+  (say (bool (not (= 1 1) ) ) )
+  (say (bool (= "lascra" "lascra") ) )
+  (say (bool (> 2 1) ) )
+  (say (bool (< 1 2) ) )
+  (say (bool (contains "lascra" "scra") ) )
+  (say (bool (list_contains MyList "lascra") ) )
+  (say (bool (mouse_down) ) )
+  (say (bool (pressed space) ) )
+  (say (bool (touching _mouse_) ) )
+  (say (bool (touching_color #00ff00) ) )
+  (say (bool (color_touching_color #ffffff #000000) ) )
+
+  (# Extensions)
+  (# Go Force and Acceleration)
+  (say (bool (go_falling) ) ) )
+)

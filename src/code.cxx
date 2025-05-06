@@ -616,9 +616,27 @@ std::string ask(bparser::node& sprite, bparser::node& param) {
 	if (param.size() != 1) throw error("Expected 1 parameter");
 	std::string id = id::get("ask");
 	bparser::node& ask = block(id, "sensing_askandwait", false);
-	try { ask.find("inputs").push(&parameter_string(sprite, param[0], id)).value = "QUESTION"; }
-	catch (std::exception& e) { throw error("question", e); }
+	ask.find("inputs").push(&parameter_string(sprite, param[0], id)).value = "QUESTION";
 	sprite.find("blocks").push(&ask);
+	return id;
+}
+// (draggable false)
+std::string draggable(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 1) throw error("Expected 1 parameter");
+	std::string id = id::get("drag");
+	bparser::node& drag = block(id, "sensing_setdragmode", false);
+  drag.find("fields").push(&field_parameter(param[0], {
+    {"true","draggable"},
+    {"false", "not draggable"}
+  })).value = "DRAG_MODE";
+	sprite.find("blocks").push(&drag);
+	return id;
+}
+std::string reset_timer(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 0) throw error("Expected no parameters");
+	std::string id = id::get("resettimer");
+	bparser::node& timer = block(id, "sensing_resettimer", false);
+	sprite.find("blocks").push(&timer);
 	return id;
 }
 
@@ -691,6 +709,8 @@ std::string code(bparser::node& sprite, bparser::node& code, bparser::node* prev
 		else if (code.value == "hide_variable" || code.value == "hide_list") return hide_data(sprite, code);
 		// Sensing
 		else if (code.value == "ask") return ask(sprite, code);
+		else if (code.value == "reset_timer") return reset_timer(sprite, code);
+		else if (code.value == "draggable") return draggable(sprite, code);
     // Error
 		else throw error("Unknown command");
 	}

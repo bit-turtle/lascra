@@ -63,6 +63,12 @@ Here `say` is a block which accepts a string parameter as an input `PARAM.md`
   - `(clone _myself_)`
 * (delete_clone)
   - Can also be written without parentheses
+### Sensing
+* (ask *string*)
+* (reset_timer)
+* (draggable *true/false*)
+  - `true`
+  - `false`
 ### Data
 * (set *variableName* *string*)
 * (change *variableName* *number*)

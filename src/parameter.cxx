@@ -584,6 +584,20 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 		}
 		catch (std::exception& e) { throw error(0, "sprite", e); }
 	}
+  else if (code.value == "touching_color") {
+    if (code.size() != 1) throw error("Expected 1 parameter");
+    boolean = &block(id::get("touchcolor"), "sensing_touchingcolor", false);
+    boolean->find("inputs").push(&parameter_color(sprite, code[0], boolean->value))
+      .value = "COLOR";
+  }
+  else if (code.value == "color_touching_color") {
+    if (code.size() != 2) throw error("Expected 2 parameters");
+    boolean = &block(id::get("touchcolor"), "sensing_touchingcolor", false);
+    boolean->find("inputs").push(&parameter_color(sprite, code[0], boolean->value))
+      .value = "COLOR";
+    boolean->find("inputs").push(&parameter_color(sprite, code[1], boolean->value))
+      .value = "COLOR2";
+  }
 	// Extensions
 	else if (code.value == "go_falling") {
 		if (code.size() != 0) throw error("Expected no parameters");
@@ -597,6 +611,57 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 	sprite.find("blocks").push(boolean);
 
 	return node;
+}
+
+bparser::node& parameter_color(bparser::node& sprite, bparser::node& code, std::string parentid) {
+	bool param = (code.size() == 0) ? false : true;
+	bparser::node& input = *(new bparser::node(""));
+	input.emplace(((param) ? "3" : "1"));
+	if (param) {
+    bparser::node& parameter = input.emplace("");
+    parameter_generic(sprite, code, parameter, parentid);
+	}
+  //Input validaton
+  if (!param) {
+    std::istringstream hex;
+    hex.str(code.value);
+    int n = 0;
+    char c;
+    while (hex.get(c)) {
+      n++;
+      if (n == 1) {
+        if (c != '#')
+          throw error("Color values start with \"#\"");
+        else continue;
+      }
+      if (
+        (c != '0') &&
+        (c != '1') &&
+        (c != '2') &&
+        (c != '3') &&
+        (c != '4') &&
+        (c != '5') &&
+        (c != '6') &&
+        (c != '7') &&
+        (c != '8') &&
+        (c != '9') &&
+        (c != 'a') &&
+        (c != 'b') &&
+        (c != 'c') &&
+        (c != 'd') &&
+        (c != 'e') &&
+        (c != 'f')
+      )
+        throw error("Expected hex value (Lowercase)");
+    }
+    input.emplace(code.value).string = true;
+  }
+  // Add color
+  bparser::node& color = input.emplace("");
+  color.emplace("9");
+  color.emplace((param) ? "#000000" : code.value);
+  // Return parameter
+	return input;
 }
 
 bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std::string parentid, std::string name, std::string opcode, std::string field) {
