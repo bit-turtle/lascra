@@ -1,0 +1,20 @@
+(declare
+  (name "Define Example")
+)
+(define
+  (variable LocalVariable 0)
+  (list LocalList 1 2 3)
+  (broadcast Broadcast)
+  (global_variable GlobalVariable)
+  (global_list GlobalList)
+)
+(when flag
+  (say_for (variable LocalVariable) 2)
+  (say_for (variable GlobalVariable) 2)
+  (say_for (list LocalList) 2)
+  (say_for (list GlobalList) 2)
+  (broadcast Broadcast)
+)
+(when (received Broadcast)
+  (say "Broadcast Received")
+)

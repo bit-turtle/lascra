@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
 	removalLevel.add_argument("-k", "--keep")
 		.store_into(keep)
 		.help("keep all existing code");
-	
+
 	bool display = false;
 	lascra.add_argument("-d", "--display")
 		.store_into(display)
@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
 	lascra.add_argument("files")
 		.remaining()
 		.help("specify code files to compile");
-	
+
 	try {
 		lascra.parse_args(argc, argv);
 	}
@@ -207,9 +207,18 @@ int main(int argc, char* argv[]) {
 		sprite.find("blocks").display("  ", "- ");
 	}
 
-	// Clear broadcast list if not Stage (Scratch broadcasts don't work otherwise)
-	if (sprite.find("isStage")[0].value != "true")
+  // Clear global definitions if not Stage
+	if (sprite.find("isStage")[0].value != "true") {
 		sprite.find("broadcasts").clear();
+    for (int i = 0; i <= 1; i++) {
+      bparser::node& target = sprite.find((i == 0) ? "variables" : "lists");
+      for (int t = 0; t < target.size(); t++) {
+        if (target[t].size() == 2) continue;
+        target.erase(t);
+        t--;
+      }
+    }
+  }
 	// Set Name to "Stage" if isStage is true (Won't import otherwise)
 	else
 		sprite.find("name")[0].value = "Stage";
@@ -223,6 +232,6 @@ int main(int argc, char* argv[]) {
 	// Save updated file
 	ZipFile::SaveAndClose(sprite3, sprite3filename);
 	std::cout << "Done!" << std::endl;
-	
+
 	return EXIT_SUCCESS;
 }
