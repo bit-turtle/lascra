@@ -245,8 +245,8 @@ std::string size(bparser::node& sprite, bparser::node& code) {
 std::string effect(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 2) throw error("Expected 2 parameters");
 	std::string id = id::get("effect");
-	bparser::node& set_effect = block(id, (code.value == "set_effect") ? "looks_seteffectto" : "looks_changeeffectby", false);
-	bparser::node& effect = set_effect.find("fields").push(&field_parameter(code[0], {
+	bparser::node& effect = block(id, (code.value == "set_effect") ? "looks_seteffectto" : "looks_changeeffectby", false);
+  effect.find("fields").push(&field_parameter(code[0], {
     {"color", "COLOR"},
     {"fisheye", "FISHEYE"},
     {"whirl", "WHIRL"},
@@ -254,9 +254,9 @@ std::string effect(bparser::node& sprite, bparser::node& code) {
     {"mosaic","MOSAIC"},
     {"brightness","BRIGHTNESS"},
     {"ghost","GHOST"}
-  }));
-	set_effect.find("inputs").push(&parameter_number(sprite, code[1], id)).value = (code.value == "set_effect") ? "VALUE" : "CHANGE";
-	sprite.find("blocks").push(&set_effect);
+  })).value = "EFFECT";
+	effect.find("inputs").push(&parameter_number(sprite, code[1], id)).value = (code.value == "set_effect") ? "VALUE" : "CHANGE";
+	sprite.find("blocks").push(&effect);
 	return id;
 }
 std::string clear_effects(bparser::node& sprite, bparser::node& param) {
@@ -640,6 +640,47 @@ std::string reset_timer(bparser::node& sprite, bparser::node& param) {
 	return id;
 }
 
+// Extentions
+
+// Pen
+// up, down, stamp, and clear
+std::string pen(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 0) throw error("Expected no parameters");
+	std::string id = id::get("pen");
+	bparser::node& pen = block(id,
+      (param.value == "pen_up") ? "pen_penUp"
+      : ((param.value == "pen_down") ? "pen_penDown"
+      : ((param.value == "pen_stamp") ? "pen_stamp"
+      : "pen_clear"
+      )),false);
+	sprite.find("blocks").push(&pen);
+	return id;
+}
+std::string pen_color(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 1) throw error("Expected 1 parameter");
+	std::string id = id::get("pencolor");
+	bparser::node& pen = block(id, "pen_setPenColorToColor", false);
+  pen.find("inputs").push(&parameter_color(sprite, param[0], id)).value = "COLOR";
+	sprite.find("blocks").push(&pen);
+	return id;
+}
+// pen_set, pen_change
+std::string pen_param(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 2) throw error("Expected 2 parameters");
+	std::string id = id::get("penparam");
+	bparser::node& pen = block(id, (sprite.value == "pen_set") ? ((param[0].value == "size") ? "pen_setPenSizeTo" : "pen_setPenColorParamTo") : ((param[0].value == "size") ?"pen_changePenSizeBy" : "pen_changePenColorParamBy"), false);
+  if (param[0].value != "size")
+    pen.find("inputs").push(&shadow_parameter(sprite, param[0], id, "penmenu", "pen_menu_colorParam", "colorParam", {
+        {"color","color"},
+        {"saturation","saturation"},
+        {"brightness","brightness"},
+        {"transparency","transparency"}
+      }, false, true)).value = "COLOR_PARAM";
+  else if (param[0].size() != 0) throw error("Unknown pen parameter");
+  pen.find("inputs").push(&parameter_number(sprite, param[1], id)).value = (param[0].value == "size") ? "SIZE" : "VALUE";
+	sprite.find("blocks").push(&pen);
+	return id;
+}
 
 // Main Code Function
 std::string code(bparser::node& sprite, bparser::node& code, bparser::node* previf) {
@@ -711,6 +752,10 @@ std::string code(bparser::node& sprite, bparser::node& code, bparser::node* prev
 		else if (code.value == "ask") return ask(sprite, code);
 		else if (code.value == "reset_timer") return reset_timer(sprite, code);
 		else if (code.value == "draggable") return draggable(sprite, code);
+    // Extentions
+    else if (code.value == "pen_up" || code.value == "pen_down" || code.value == "pen_stamp" || code.value == "pen_clear") return pen(sprite, code);
+    else if (code.value == "pen_color") return pen_color(sprite, code);
+    else if (code.value == "pen_set" || code.value == "pen_change") return pen_param(sprite, code);
     // Error
 		else throw error("Unknown command");
 	}

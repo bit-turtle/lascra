@@ -35,7 +35,9 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 bparser::node& parameter_color(bparser::node& sprite, bparser::node& code, std::string parentid);
 
 // Shadow parameter, Accepts strings or generic parameters
-bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std::string parentid, std::string name, std::string opcode, std::string field);
+bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std::string parentid, std::string name, std::string opcode, std::string field, bool noNull = false);
+bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std::string parentid, std::string name, std::string opcode, std::string field, std::map<std::string,std::string> values, bool acceptAll = false, bool noNull = false);
 
 // Field parameter, Accepts only strings
-bparser::node& field_parameter(bparser::node& code, std::map<std::string,std::string> values);
+bparser::node& field_parameter(bparser::node& code, bool noNull = false);
+bparser::node& field_parameter(bparser::node& code, std::map<std::string,std::string> values, bool default = false, bool noNull = false);

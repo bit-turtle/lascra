@@ -513,7 +513,7 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 	}
 	else if (code.value == "not") {
 		if (code.size() != 1) throw error("Expected 1 parameter");
-		boolean = &block(id::get("or"), "operator_or");
+		boolean = &block(id::get("not"), "operator_not");
 		try { boolean->find("inputs").push(&parameter_bool(sprite, code[0], boolean->value)).value = "OPERAND"; }
 		catch (std::exception& e) { throw error(0, e); }
 	}
@@ -654,7 +654,6 @@ bparser::node& parameter_color(bparser::node& sprite, bparser::node& code, std::
       )
         throw error("Expected hex value (Lowercase)");
     }
-    input.emplace(code.value).string = true;
   }
   // Add color
   bparser::node& color = input.emplace("");
@@ -664,7 +663,11 @@ bparser::node& parameter_color(bparser::node& sprite, bparser::node& code, std::
 	return input;
 }
 
-bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std::string parentid, std::string name, std::string opcode, std::string field) {
+bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std::string parentid, std::string name, std::string opcode, std::string field, bool noNull) {
+  return shadow_parameter(sprite, code, parentid, name, opcode, field, {}, true, noNull);
+}
+
+bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std::string parentid, std::string name, std::string opcode, std::string field, std::map<std::string,std::string> values, bool acceptAll, bool noNull) {
 	bool param = (code.size() == 0) ? false : true;
 	bparser::node& input = *(new bparser::node(field));
 	input.emplace(((param) ? "3" : "1"));
@@ -679,17 +682,24 @@ bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std:
 	}
 	bparser::node& shadow = block(id::get(name), opcode, false, true);
 	parent(shadow, parentid);
-	bparser::node& shadowfield = shadow.find("fields").emplace(field);
-	shadowfield.emplace((param) ? "lascra" : code.value).string = true;
-	shadowfield.emplace("null");
+	if (acceptAll) shadow.find("fields").push(&field_parameter(code, noNull)).value = field;
+  else shadow.find("fields").push(&field_parameter(code, values, param, noNull)).value = field;
 	sprite.find("blocks").push(&shadow);
 	input.emplace(shadow.value);
 	return input;
 }
 
-bparser::node& field_parameter(bparser::node& code, std::map<std::string, std::string> values) {
+bparser::node& field_parameter(bparser::node& code, bool noNull) {
+  if (code.size() != 0) throw error("Invalid value");
+  bparser::node& field = *(new bparser::node(""));
+  field.emplace(code.value).string = true;
+  if (!noNull) field.emplace("null");
+  return field;
+}
+
+bparser::node& field_parameter(bparser::node& code, std::map<std::string, std::string> values, bool default, bool noNull) {
   std::map<std::string,std::string>::iterator value = values.find(code.value);
-  if (value == values.end() || code.size() != 0) {
+  if (!default) if (value == values.end() || code.size() != 0) {
     std::ostringstream err;
     err << "Invalid value (Expected: ";
     for (value = values.begin(); value != values.end(); ++value) {
@@ -700,7 +710,8 @@ bparser::node& field_parameter(bparser::node& code, std::map<std::string, std::s
     throw error(err.str());
   }
   bparser::node& field = *(new bparser::node(""));
-	field.emplace(value->second).string = true;
-	field.emplace("null");
+  bparser::node* target = (!noNull) ? &field : &field.emplace("");
+	target->emplace((default) ? values.begin()->second : value->second).string = true;
+	if (!noNull) target->emplace("null");
 	return field;
 }
