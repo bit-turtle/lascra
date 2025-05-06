@@ -8,13 +8,7 @@
 #include "id.hxx"
 
 #include <string>
-
-bparser::node* field(std::string value) {
-	bparser::node* field = new bparser::node("");
-	field->emplace(value);
-	field->emplace("null");
-	return field;
-}
+#include <sstream>
 
 void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node& node, std::string parentid) {
 	// Type
@@ -216,23 +210,18 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 	else if (code.value == "current") {
 		if (code.size() != 1) throw error("Expected 1 parameter");
 		std::string currentid = id::get("current");
-		bparser::node& current = block(currentid, "sensing_current");
+		bparser::node& current = block(currentid, "sensing_current", false);
 		// Process function
-		bparser::node& menu = current.find("fields").emplace("CURRENTMENU");
-		std::string time;
-		if (code[0].value == "year") time = "YEAR";
-		else if (code[0].value == "month") time = "MONTH";
-		else if (code[0].value == "date") time = "DATE";
-		else if (code[0].value == "day_of_week") time = "DAYOFWEEK";
-		else if (code[0].value == "hour") time = "HOUR";
-		else if (code[0].value == "minute") time = "MINUTE";
-		else if (code[0].value == "second") time = "SECOND";
-		else throw error("Unknown time period, try \"year\"");
-		menu.emplace(time);
-		menu.emplace("null");
+		current.find("fields").push(&field_parameter(code[0], {
+      {"year","YEAR"},
+      {"month","MONTH"},
+      {"date","DATE"},
+      {"day_of_week","DAYOFWEEK"},
+      {"hour","HOUR"},
+      {"minute","MINUTE"},
+      {"second","SECOND"}
+    })).value = "CURRENTMENU";
 		// Add to sprite
-		current.find("topLevel")[0].value = "false";
-		parent(current, parentid);
 		sprite.find("blocks").push(&current);
 		node.emplace(currentid);
 	}
@@ -631,4 +620,22 @@ bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std:
 	sprite.find("blocks").push(&shadow);
 	input.emplace(shadow.value);
 	return input;
+}
+
+bparser::node& field_parameter(bparser::node& code, std::map<std::string, std::string> values) {
+  std::map<std::string,std::string>::iterator value = values.find(code.value);
+  if (value == values.end() || code.size() != 0) {
+    std::ostringstream err;
+    err << "Invalid value (Expected: ";
+    for (value = values.begin(); value != values.end(); ++value) {
+      if (value != values.begin()) err << ",";
+      err << value->first;
+    }
+    err << ")";
+    throw error(err.str());
+  }
+  bparser::node& field = *(new bparser::node(""));
+	field.emplace(value->second).string = true;
+	field.emplace("null");
+	return field;
 }

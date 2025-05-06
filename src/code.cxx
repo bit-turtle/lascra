@@ -234,55 +234,28 @@ std::string next_backdrop(bparser::node& sprite, bparser::node& code) {
 	sprite.find("blocks").push(&nextbackdrop);
 	return id;
 }
-std::string change_size(bparser::node& sprite, bparser::node& code) {
-	if (code.size() != 1) throw error("Expected 1 parameter");
-	std::string id = id::get("changesize");
-	bparser::node& change_size = block(id, "looks_changesizeby", false);
-	change_size.find("inputs").push(&parameter_number(sprite, code[0], id)).value = "CHANGE";
-	sprite.find("blocks").push(&change_size);
-	return id;
-}
-std::string set_size(bparser::node& sprite, bparser::node& code) {
+std::string size(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 1) throw error("Expected 1 parameter");
 	std::string id = id::get("setsize");
-	bparser::node& set_size = block(id, "looks_setsizeto", false);
-	set_size.find("inputs").push(&parameter_number(sprite, code[0], id)).value = "SIZE";
+	bparser::node& set_size = block(id, (code.value == "set_size") ? "looks_setsizeto" : "looks_changesizeby", false);
+	set_size.find("inputs").push(&parameter_number(sprite, code[0], id)).value = (code.value == "set_size") ? "SIZE" : "CHANGE";
 	sprite.find("blocks").push(&set_size);
 	return id;
 }
-std::string change_effect(bparser::node& sprite, bparser::node& code) {
+std::string effect(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 2) throw error("Expected 2 parameters");
-	std::string id = id::get("changeeffect");
-	bparser::node& change_effect = block(id, "looks_changeeffectby", false);
-	bparser::node& effect = change_effect.find("fields").emplace("EFFECT");
-	if (code[0].value == "color") effect.emplace("COLOR");
-	else if (code[0].value == "fisheye") effect.emplace("FISHEYE");
-	else if (code[0].value == "whirl") effect.emplace("WHIRL");
-	else if (code[0].value == "pixelate") effect.emplace("PIXELATE");
-	else if (code[0].value == "mosaic") effect.emplace("MOSAIC");
-	else if (code[0].value == "brightness") effect.emplace("BRIGHTNESS");
-	else if (code[0].value == "ghost") effect.emplace("GHOST");
-	else throw error("Not a valid effect name");
-	effect.emplace("null");
-	change_effect.find("inputs").push(&parameter_number(sprite, code[1], id)).value = "CHANGE";
-	sprite.find("blocks").push(&change_effect);
-	return id;
-}
-std::string set_effect(bparser::node& sprite, bparser::node& code) {
-	if (code.size() != 2) throw error("Expected 2 parameters");
-	std::string id = id::get("seteffect");
-	bparser::node& set_effect = block(id, "looks_seteffectto", false);
-	bparser::node& effect = set_effect.find("fields").emplace("EFFECT");
-	if (code[0].value == "color") effect.emplace("COLOR");
-	else if (code[0].value == "fisheye") effect.emplace("FISHEYE");
-	else if (code[0].value == "whirl") effect.emplace("WHIRL");
-	else if (code[0].value == "pixelate") effect.emplace("PIXELATE");
-	else if (code[0].value == "mosaic") effect.emplace("MOSAIC");
-	else if (code[0].value == "brightness") effect.emplace("BRIGHTNESS");
-	else if (code[0].value == "ghost") effect.emplace("GHOST");
-	else throw error("Not a valid effect name");
-	effect.emplace("null");
-	set_effect.find("inputs").push(&parameter_number(sprite, code[1], id)).value = "VALUE";
+	std::string id = id::get("effect");
+	bparser::node& set_effect = block(id, (code.value == "set_effect") ? "looks_seteffectto" : "looks_changeeffectby", false);
+	bparser::node& effect = set_effect.find("fields").push(&field_parameter(code[0], {
+    {"color", "COLOR"},
+    {"fisheye", "FISHEYE"},
+    {"whirl", "WHIRL"},
+    {"pixelate","PIXELATE"},
+    {"mosaic","MOSAIC"},
+    {"brightness","BRIGHTNESS"},
+    {"ghost","GHOST"}
+  }));
+	set_effect.find("inputs").push(&parameter_number(sprite, code[1], id)).value = (code.value == "set_effect") ? "VALUE" : "CHANGE";
 	sprite.find("blocks").push(&set_effect);
 	return id;
 }
@@ -304,6 +277,77 @@ std::string hide(bparser::node& sprite, bparser::node& param) {
 	if (param.size() != 0) throw error("Expected no parameters");
 	std::string id = id::get("hide");
 	bparser::node& hide = block(id, "looks_hide", false);
+	sprite.find("blocks").push(&hide);
+	return id;
+}
+std::string goto_layer(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 1) throw error("Expected 1 parameter");
+	if (param[0].value != "front" && param[0].value != "back")
+		throw error("Unknown layer (Expected \"front\" or \"back\")");
+	std::string id = id::get("layer");
+	bparser::node& layer = block(id, "looks_gotofrontback", false);
+	bparser::node& field = layer.find("fields").emplace("FRONT_BACK");
+	field.emplace(param[0].value);
+	field.emplace("null");
+	sprite.find("blocks").push(&layer);
+	return id;
+}
+std::string go_layers(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 2) throw error("Expected 2 parameters");
+	if (param[0].value != "forward" && param[0].value != "backward")
+		throw error("Unknown layer (Expected \"front\" or \"back\")");
+	std::string id = id::get("layer");
+	bparser::node& layer = block(id, "looks_goforwardbackwardlayers", false);
+	bparser::node& field = layer.find("fields").emplace("FORWARD_BACKWARD");
+	field.emplace(param[0].value);
+	field.emplace("null");
+	layer.find("inputs").push(&parameter_number(sprite, param[1], id, false, true)).value = "NUM";
+	sprite.find("blocks").push(&layer);
+	return id;
+}
+// Sound
+std::string play_sound(bparser::node& sprite, bparser::node& param) {
+  if (param.size() != 1) throw error("Expected 1 parameter");
+  std::string id = id::get("play");
+  bparser::node& play = block(id, ((param.value == "play") ? "sound_play" : "sound_playuntildone"), false);
+  play.find("inputs").push(&shadow_parameter(sprite, param[0], id, "soundmenu", "sound_sounds_menu", "SOUND_MENU"));
+  sprite.find("blocks").push(&play);
+  return id;
+}
+std::string stop_sounds(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 0) throw error("Expected no parameters");
+	std::string id = id::get("hide");
+	bparser::node& hide = block(id, "sound_stopallsounds", false);
+	sprite.find("blocks").push(&hide);
+	return id;
+}
+std::string volume(bparser::node& sprite, bparser::node& param) {
+  if (param.size() != 1) throw error("Expected 1 parameter");
+  std::string id = id::get("volume");
+  bparser::node& volume = block(id, ((param.value == "set_volume") ? "sound_setvolumeto" : "sound_changevolumeby"), false);
+  volume.find("inputs").push(&parameter_number(sprite, param[0], id)).value = "VOLUME";
+  sprite.find("blocks").push(&volume);
+  return id;
+}
+// sound effects (sfx) [set_sfx,change_sfx]
+std::string sfx(bparser::node& sprite, bparser::node& param) {
+  if (param.size() != 2) throw error("Expected 2 parameters");
+  std::string id = id::get("effect");
+  bparser::node& effect = block(id, ((param.value == "set_sfx") ? "sound_seteffectto" : "sound_changeeffectby"), false);
+  // Sound effect name
+  effect.find("fields").push(&field_parameter(param[0], {
+        {"pitch", "PITCH"},
+        {"pan", "PAN"}
+  })).value = "EFFECT";
+  // Value
+  effect.find("inputs").push(&parameter_number(sprite, param[1], id)).value = "VALUE";
+  sprite.find("blocks").push(&effect);
+  return id;
+}
+std::string clear_sfx(bparser::node& sprite, bparser::node& param) {
+	if (param.size() != 0) throw error("Expected no parameters");
+	std::string id = id::get("hide");
+	bparser::node& hide = block(id, "sound_cleareffects", false);
 	sprite.find("blocks").push(&hide);
 	return id;
 }
@@ -373,7 +417,7 @@ std::string else_then(bparser::node& sprite, bparser::node& param, bparser::node
 		sub.emplace(substack(sprite, param, 0, previf->value));
 	}
 	previf->find("next")[0].value = "null";
-	
+
 	return previf->value;
 }
 std::string repeat(bparser::node& sprite, bparser::node& param) {
@@ -389,7 +433,7 @@ std::string repeat(bparser::node& sprite, bparser::node& param) {
 		sub.emplace(substack(sprite, param, 1, id));
 	}
 	repeat.find("next")[0].value = "null";
-	
+
 	return id;
 }
 std::string repeat_until(bparser::node& sprite, bparser::node& param) {
@@ -608,14 +652,20 @@ std::string code(bparser::node& sprite, bparser::node& code, bparser::node* prev
 		else if (code.value == "backdrop") return backdrop(sprite, code);
 		else if (code.value == "next_costume") return next_costume(sprite, code);
 		else if (code.value == "next_backdrop") return next_backdrop(sprite, code);
-		else if (code.value == "change_size") return change_size(sprite, code);
-		else if (code.value == "set_size") return set_size(sprite, code);
-		else if (code.value == "change_effect") return change_effect(sprite, code);
-		else if (code.value == "set_effect") return set_effect(sprite, code);
+		else if (code.value == "set_size" || code.value == "change_size") return size(sprite, code);
+		else if (code.value == "set_effect" || code.value == "change_effect") return effect(sprite, code);
 		else if (code.value == "clear_effects") return clear_effects(sprite, code);
 		else if (code.value == "show") return show(sprite, code);
 		else if (code.value == "hide") return hide(sprite, code);
-		// Events
+		else if (code.value == "goto_layer") return goto_layer(sprite, code);
+		else if (code.value == "go_layers") return go_layers(sprite, code);
+		// Sounds
+		else if (code.value == "set_sfx" || code.value == "change_sfx") return sfx(sprite, code);
+		else if (code.value == "clear_sfx") return clear_sfx(sprite, code);
+		else if (code.value == "set_volume" || code.value == "change_volume") return volume(sprite, code);
+		else if (code.value == "play_sound") return play_sound(sprite, code);
+		else if (code.value == "stop_sounds") return stop_sounds(sprite, code);
+    // Events
 		else if (code.value == "broadcast" || code.value == "broadcast_wait") return send_broadcast(sprite, code);
 		// Control
 		else if (code.value == "wait") return wait(sprite, code);
@@ -641,6 +691,7 @@ std::string code(bparser::node& sprite, bparser::node& code, bparser::node* prev
 		else if (code.value == "hide_variable" || code.value == "hide_list") return hide_data(sprite, code);
 		// Sensing
 		else if (code.value == "ask") return ask(sprite, code);
+    // Error
 		else throw error("Unknown command");
 	}
 	catch (std::exception& e) {

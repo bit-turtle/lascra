@@ -18,6 +18,7 @@
 
 #include <bparser/node.hxx>
 #include <string>
+#include <map>
 
 // Parameter function, returns a scratch enum
 
@@ -32,3 +33,6 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 
 // Shadow parameter, Accepts strings or generic parameters
 bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std::string parentid, std::string name, std::string opcode, std::string field);
+
+// Field parameter, Accepts only strings
+bparser::node& field_parameter(bparser::node& code, std::map<std::string,std::string> values);

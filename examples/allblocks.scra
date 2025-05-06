@@ -42,11 +42,20 @@
 	(hide)
 	(clear_effects)
 	(change_effect pixelate 45)
+	(goto_layer front)
+	(go_layers forward 2)
+
+  (# Sounds Category)
+  (play_sound pop)
+  (stop_sounds)
+  (set_sfx pitch 120)
+  (change_sfx pan 10)
+  (clear_sfx)
 
 	(# Events Category )
 	(broadcast broadcast1)
 	(broadcast_wait broadcast2)
-	
+
 	(# Control Category )
 	(wait 5)
 	(wait_until (= (+ 2 2) 4) )
