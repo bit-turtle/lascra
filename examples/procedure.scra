@@ -1,0 +1,8 @@
+(declare
+  (name "Procedure Example")
+)
+(procedure say_hi (say hi for (number seconds) seconds if (boolean condition) )
+  (if (argument condition)
+    (say_for "Hi!" (argument seconds) )
+  )
+)

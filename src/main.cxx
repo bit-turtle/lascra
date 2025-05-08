@@ -152,8 +152,10 @@ int main(int argc, char* argv[]) {
 		sprite.find("variables").clear();
 		sprite.find("lists").clear();
 		sprite.find("broadcasts").clear();
+    if (sprite.exists("ls_procedures")) sprite.find("ls_procedures").clear();
 	}
 	else if (!keep) for (int i = 0; i < 4; i++) {
+    if (sprite.exists("ls_procedures")) sprite.find("ls_procedures").clear();
 		bparser::node* section;
 		if (i == 0) section = &sprite.find("blocks");
 		else if (i == 1) section = &sprite.find("variables");

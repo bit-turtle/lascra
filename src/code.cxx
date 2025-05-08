@@ -38,7 +38,7 @@ std::string substack(bparser::node& sprite, bparser::node& param, int offset, st
 		catch (std::exception& e) { throw error(i, e); }
 	}
 
-	return startid;
+	return (startid.empty()) ? "null" : startid;
 }
 // Motion
 std::string move(bparser::node& sprite, bparser::node& code) {

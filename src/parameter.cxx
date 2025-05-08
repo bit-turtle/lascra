@@ -10,13 +10,32 @@
 #include <string>
 #include <sstream>
 
+#include "procedure.hxx"
+
+void parameter_argument(bparser::node& sprite, bparser::node& code, bparser::node& node, std::string parentid) {
+
+}
+
 void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node& node, std::string parentid) {
 	// Type
-	if (code.value == "bool") {
-		try {
-			node.push(&parameter_bool(sprite, code[0], parentid)).erase(0);
-		}
-		catch (std::exception& e) { throw error(0, "bool", e); }
+  if (code.value == "argument") {
+    // Procedure arguments
+    if (!inProcedure()) throw error("Not in a procedure!");
+    if (code.size() != 1 || code[0].size() != 0) throw error("Expected 1 parameter");
+    bparser::node& procedure = sprite.find("ls_procedures").last();
+    if (!procedure.find("arguments").exists(code[0].value)) throw error(0, code[0].value, "Argument does not exist");
+    bparser::node& arg = procedure.find("arguments").find(code[0].value);
+    // Create Block
+    bparser::node& reporter = block(id::get("argument"), ((arg[0].value == "string") ? "argument_reporter_string_number" : "argument_reporter_boolean"), false);
+    bparser::node& value = reporter.find("fields").emplace("VALUE");
+    value.emplace(arg.value).string = true;
+    value.emplace("null");
+    parent(reporter, parentid);
+    sprite.find("blocks").push(&reporter);
+    node.emplace(reporter.value);
+  }
+  else if (code.value == "bool") {
+		node.push(&parameter_bool(sprite, code[0], parentid)).erase(0);
 	}
 	else if (code.value == "variable") {
 		if (code.size() != 1) throw error("Expected 1 parameter");
@@ -495,7 +514,21 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 	node.emplace("2");
 
 	bparser::node* boolean;
-	if (code.value == "and") {
+  if (code.value == "argument") {
+    // Procedure arguments
+    if (!inProcedure()) throw error("Not in a procedure!");
+    if (code.size() != 1 || code[0].size() != 0) throw error("Expected 1 parameter");
+    bparser::node& procedure = sprite.find("ls_procedures").last();
+    if (!procedure.find("arguments").exists(code[0].value)) throw error(0, code[0].value, "Argument does not exist");
+    bparser::node& arg = procedure.find("arguments").find(code[0].value);
+    if (arg[0].value == "string") throw error("Argument is not boolean");
+    // Create Block
+    boolean = &block(id::get("argument"), "argument_reporter_boolean", false);
+    bparser::node& value = boolean->find("fields").emplace("VALUE");
+    value.emplace(arg.value).string = true;
+    value.emplace("null");
+  }
+  else if (code.value == "and") {
 		if (code.size() != 2) throw error("Expected 2 parameters");
 		boolean = &block(id::get("and"), "operator_and");
 		try { boolean->find("inputs").push(&parameter_bool(sprite, code[0], boolean->value)).value = "OPERAND1"; }

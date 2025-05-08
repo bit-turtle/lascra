@@ -12,6 +12,8 @@
 #include "define.hxx"
 #include "when.hxx"
 
+#include "procedure.hxx"
+
 void compile(bparser::node& sprite, bparser::node& code) {
 	for (int i = 0; i < code.size(); i++) {
 		if (code[i].value == "#") continue;
@@ -37,6 +39,14 @@ void compile(bparser::node& sprite, bparser::node& code) {
 			}
 			catch (std::exception& e) {
 				throw error(i, "when", e);
+			}
+		}
+		else if (code[i].value == "procedure") {
+			try {
+				procedure(sprite, code[i]);
+			}
+			catch (std::exception& e) {
+				throw error(i, "procedure", e);
 			}
 		}
 		else {
