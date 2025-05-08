@@ -2,7 +2,10 @@
 lascra is a compiler that compiles a lisp like language into scratch sprite3 files
 ## Information
 * Documentation in `docs` folder
-* Not all scratch blocks are supported at the moment.
+* Examples in the `examples` folder
+* All base scratch blocks are supported
+* Some blocks from extensions are supported
+  - Pen extension is fully supported
 * A web version can be compiled using Emscripten
 ## Usage
 `lascra sprite.sprite3 [code files...]`
@@ -11,9 +14,9 @@ lascra is a compiler that compiles a lisp like language into scratch sprite3 fil
 * Compiles code files
 * Adds generated code into `sprite.json` and saves `sprite.sprite3`
 ## Example Usage
-1. Export a Sprite in the scratch editor called "MySprite"  
+1. Export a Sprite in the scratch editor called "MySprite"
 ![Export Sprite](images/export.png)
-2. Run `lascra MySprite.sprite3 examples/example.scra`  
+2. Run `lascra MySprite.sprite3 examples/example.scra`
 Contents of `example.scra`:
 ```
 (declare
@@ -22,10 +25,13 @@ Contents of `example.scra`:
 (define
     (variable counter 0)
 )
+(procedure say_wait (Say (string message) and wait for (number seconds) seconds)
+    (say (argument message) )
+    (wait (argument seconds) )
+)
 (when flag
-    (say "Hello, World!")
-    (wait 5)
-    (say (join 
+    (call say_wait "Hello World!" 15)
+    (say (join
         "2*4+3="
         (+ (* 2 4) 3)
     ) )
@@ -48,13 +54,16 @@ Contents of `example.scra`:
     (if (= (value answer) 4)
         (say "Correct!")
     )
+    (elif (= (value answer) 0)
+        (say "That would be for subtraction")
+    )
     (else
         (say "Incorrect")
     )
 )
 ```
-3. Upload the edited Sprite file in the scratch editor  
+3. Upload the edited Sprite file in the scratch editor
 ![Upload Sprite](images/upload.png)
 
-This results in the following code:  
+This results in the following code:
 ![Resulting Code](images/example.png)

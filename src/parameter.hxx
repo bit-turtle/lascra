@@ -40,4 +40,4 @@ bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std:
 
 // Field parameter, Accepts only strings
 bparser::node& field_parameter(bparser::node& code, bool noNull = false);
-bparser::node& field_parameter(bparser::node& code, std::map<std::string,std::string> values, bool default = false, bool noNull = false);
+bparser::node& field_parameter(bparser::node& code, std::map<std::string,std::string> values, bool defaultValue = false, bool noNull = false);

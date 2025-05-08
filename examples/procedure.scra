@@ -6,3 +6,6 @@
     (say_for "Hi!" (argument seconds) )
   )
 )
+(when flag
+  (call say_hi 15 (= 1 1) )
+)

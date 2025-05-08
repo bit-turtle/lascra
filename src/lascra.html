@@ -251,6 +251,47 @@
 	(delete 4 things)
 	(replace 5 things "replacement")
 )</div>
+      <div class="example">(declare
+  (name "Functions and Procedures")
+)
+(function say_if (Say (string message) if (boolean condition) )
+  (if (argument condition)
+    (say (argument message) )
+  )
+)
+(define (variable counter) )
+(procedure countdown (Countdown from (number start) )
+  (set counter (argument start) )
+  (repeat_until (= 0 (variable counter) )
+    (say_for (variable counter) 1)
+    (change counter -1)
+  )
+)
+(when flag
+  (call countdown 5)
+  (say_for "Press to see the message" 2)
+  (forever
+    (call say_if "Generated with Lascra!" (mouse_down) )
+  )
+)</div>
+      <div class="example">(declare
+  (name "Pen")
+)
+(when flag
+  (hide)
+  (pen_clear)
+  (pen_color #000000)
+  (pen_set size 10)
+  (pen_set transparency 0)
+  (# Draw Square)
+  (pen_down)
+  (repeat 4
+    (move 50)
+    (turn_right 90)
+    (pen_change transparency 15)
+  )
+  (pen_up)
+)</div>
 		</div>
 		<script>
 			// Override console.log

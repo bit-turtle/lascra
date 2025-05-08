@@ -41,7 +41,9 @@ void compile(bparser::node& sprite, bparser::node& code) {
 				throw error(i, "when", e);
 			}
 		}
-		else if (code[i].value == "procedure") {
+		else if (code[i].value == "procedure" || code[i].value == "function") {   // function means run
+                                                                              // without screen
+                                                                              // refresh
 			try {
 				procedure(sprite, code[i]);
 			}

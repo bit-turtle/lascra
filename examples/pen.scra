@@ -1,0 +1,16 @@
+(declare
+  (name "Pen Example")
+)
+(when flag
+  (# Draws a square)
+  (pen_color #0000ff)
+  (pen_set size 5)
+  (pen_set transparency 50)
+  (pen_down)
+  (repeat 4
+    (move 10)
+    (turn_right 90)
+    (pen_change color 25)
+  )
+  (pen_up)
+)

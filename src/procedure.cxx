@@ -31,7 +31,9 @@ bool inproc = false;
 bool inProcedure() { return inproc; }
 
 void procedure(bparser::node& sprite, bparser::node& params) {
-	if (params.size() < 2) {
+	bool warp = (params.value == "function") ? true : false;  // function is a procedure that runs
+                                                            // without screen refresh (warp)
+  if (params.size() < 2) {
 		throw error("Expected at least two arguments");
 	}
   // Create Lascra Procedure List
@@ -47,7 +49,7 @@ void procedure(bparser::node& sprite, bparser::node& params) {
   bparser::node& mutation = entry.emplace("mutation");
   // Prepare Blocks
   bparser::node& definition = sprite.find("blocks").push(&block(id::get("definition"), "procedures_definition"));
-  bparser::node& prototype = sprite.find("blocks").push(&block(id::get("prototype"), "procedures_prototype", false));
+  bparser::node& prototype = sprite.find("blocks").push(&block(id::get("prototype"), "procedures_prototype", false, true));
   parent(prototype, definition.value);
   bparser::node& ref = definition.find("inputs").emplace("custom_block");
   ref.emplace("1");
@@ -102,6 +104,7 @@ void procedure(bparser::node& sprite, bparser::node& params) {
     mutation.emplace("proccode").emplace(proccode.str());
     mutation.emplace("argumentids").emplace(argumentids.str());
     mutation.emplace("argumentnames").emplace(argumentnames.str());
+    mutation.emplace("warp").emplace((warp) ? "true" : "false").string = true;
     // Procedure mutations
     protomut.emplace("tagName").emplace("mutation");
     protomut.emplace("children").emplace("");
@@ -109,6 +112,7 @@ void procedure(bparser::node& sprite, bparser::node& params) {
     protomut.emplace("argumentids").emplace(argumentids.str());
     protomut.emplace("argumentnames").emplace(argumentnames.str());
     protomut.emplace("argumentdefaults").emplace(argumentdefaults.str());
+    protomut.emplace("warp").emplace((warp) ? "true" : "false").string = true;
   }
   catch (std::exception& e) {
     throw error(1, "procedure", e);

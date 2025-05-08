@@ -8,6 +8,18 @@
 	(variable variable1)
 	(list list1)
 )
+(# Funtions are procedures which run without screen refresh)
+(function MyFunction (MyFunction (string text) )
+  (say (join "MyFunction: " (argument text) ) )
+)
+(procedure MyProcedure (MyProcedure (boolean value) )
+  (if (argument value)
+    (say "Value is True")
+  )
+  (else
+    (say "Value is False")
+  )
+)
 (when flag
 	(# Motion Category )
 	(move 5)
@@ -94,6 +106,10 @@
 	(delete 1 list1)
 	(show_list list1)
 	(hide_list list1)
+
+  (# My Blocks)
+  (call MyFunction "lascra")
+  (call MyProcedure (= 1 1) )
 
   (# Extensions)
 

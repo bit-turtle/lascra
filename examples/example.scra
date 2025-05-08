@@ -2,12 +2,15 @@
     (name MySprite)
 )
 (define
-	(variable counter 0)
+    (variable counter 0)
+)
+(procedure say_wait (Say (string message) and wait for (number seconds) seconds)
+    (say (argument message) )
+    (wait (argument seconds) )
 )
 (when flag
-    (say "Hello, World!")
-    (wait 5)
-    (say (join 
+    (call say_wait "Hello World!" 15)
+    (say (join
         "2*4+3="
         (+ (* 2 4) 3)
     ) )
@@ -29,6 +32,9 @@
     (ask "What is 2+2?")
     (if (= (value answer) 4)
         (say "Correct!")
+    )
+    (elif (= (value answer) 0)
+        (say "That would be for subtraction")
     )
     (else
         (say "Incorrect")

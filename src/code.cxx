@@ -467,7 +467,7 @@ std::string forever(bparser::node& sprite, bparser::node& param) {
 std::string send_broadcast(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 1) throw error("Expected 1 parameter");
 	std::string id = id::get("move");
-	bparser::node& broadcast = block(id, "event_broadcastandwait", false);
+	bparser::node& broadcast = block(id, (code.value == "broadcast") ? "event_broadcast" : "event_broadcastandwait", false);
 	bparser::node& input = broadcast.find("inputs").emplace("BROADCAST_INPUT");
 	input.emplace("1");
 	bparser::node& broadcastinput = input.emplace("");
@@ -664,11 +664,45 @@ std::string pen_color(bparser::node& sprite, bparser::node& param) {
 	sprite.find("blocks").push(&pen);
 	return id;
 }
+// My Blocks
+std::string call(bparser::node& sprite, bparser::node& param) {
+	if (param.size() < 1) throw error("Expected 1 or more parameters");
+	std::string id = id::get("call");
+	bparser::node& call = block(id, "procedures_call", false);
+  // Get Procedure
+  if (!sprite.exists("ls_procedures") || !sprite.find("ls_procedures").exists(param[0].value) || param[0].size() != 0) throw error("Procedure not found");
+  bparser::node& procedure = sprite.find("ls_procedures").find(param[0].value);
+  // Process parameters
+  if (param.size()-1 != procedure.find("arguments").size()) throw error("Wrong number of arguments");
+  for (int i = 0; i < procedure.find("arguments").size(); i++) {
+    try {
+      if (procedure.find("arguments")[i][0].value == "boolean") {
+        call.find("inputs").push(&parameter_bool(sprite, param[i+1], call.value)).value = procedure.find("arguments")[i][1].value;
+      }
+      else if (procedure.find("arguments")[i][0].value == "string") {
+        call.find("inputs").push(&parameter_string(sprite, param[i+1], call.value)).value = procedure.find("arguments")[i][1].value;
+      }
+      else throw error("Invalid argument type");
+    }
+    catch (std::exception& e) { throw error(i, procedure.find("arguments")[i].value, e); }
+  }
+  // Copy Mutations
+  bparser::node& mutation = call.emplace("mutation");
+  mutation.emplace("tagName").emplace("mutation");
+  mutation.emplace("children").emplace("");
+  mutation.emplace("proccode").emplace(procedure.find("mutation").find("proccode")[0].value);
+  mutation.emplace("argumentids").emplace(procedure.find("mutation").find("argumentids")[0].value);
+  mutation.emplace("warp").emplace(procedure.find("mutation").find("warp")[0].value).string = true;
+  // Add Block
+	sprite.find("blocks").push(&call);
+	return id;
+}
+
 // pen_set, pen_change
 std::string pen_param(bparser::node& sprite, bparser::node& param) {
 	if (param.size() != 2) throw error("Expected 2 parameters");
 	std::string id = id::get("penparam");
-	bparser::node& pen = block(id, (sprite.value == "pen_set") ? ((param[0].value == "size") ? "pen_setPenSizeTo" : "pen_setPenColorParamTo") : ((param[0].value == "size") ?"pen_changePenSizeBy" : "pen_changePenColorParamBy"), false);
+	bparser::node& pen = block(id, (param.value == "pen_set") ? ((param[0].value == "size") ? "pen_setPenSizeTo" : "pen_setPenColorParamTo") : ((param[0].value == "size") ?"pen_changePenSizeBy" : "pen_changePenColorParamBy"), false);
   if (param[0].value != "size")
     pen.find("inputs").push(&shadow_parameter(sprite, param[0], id, "penmenu", "pen_menu_colorParam", "colorParam", {
         {"color","color"},
@@ -752,6 +786,8 @@ std::string code(bparser::node& sprite, bparser::node& code, bparser::node* prev
 		else if (code.value == "ask") return ask(sprite, code);
 		else if (code.value == "reset_timer") return reset_timer(sprite, code);
 		else if (code.value == "draggable") return draggable(sprite, code);
+    // My Blocks
+    else if (code.value == "call") return call(sprite, code);
     // Extentions
     else if (code.value == "pen_up" || code.value == "pen_down" || code.value == "pen_stamp" || code.value == "pen_clear") return pen(sprite, code);
     else if (code.value == "pen_color") return pen_color(sprite, code);

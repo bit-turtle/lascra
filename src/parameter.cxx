@@ -730,9 +730,9 @@ bparser::node& field_parameter(bparser::node& code, bool noNull) {
   return field;
 }
 
-bparser::node& field_parameter(bparser::node& code, std::map<std::string, std::string> values, bool default, bool noNull) {
+bparser::node& field_parameter(bparser::node& code, std::map<std::string, std::string> values, bool defaultValue, bool noNull) {
   std::map<std::string,std::string>::iterator value = values.find(code.value);
-  if (!default) if (value == values.end() || code.size() != 0) {
+  if (!defaultValue) if (value == values.end() || code.size() != 0) {
     std::ostringstream err;
     err << "Invalid value (Expected: ";
     for (value = values.begin(); value != values.end(); ++value) {
@@ -744,7 +744,7 @@ bparser::node& field_parameter(bparser::node& code, std::map<std::string, std::s
   }
   bparser::node& field = *(new bparser::node(""));
   bparser::node* target = (!noNull) ? &field : &field.emplace("");
-	target->emplace((default) ? values.begin()->second : value->second).string = true;
+	target->emplace((defaultValue) ? values.begin()->second : value->second).string = true;
 	if (!noNull) target->emplace("null");
 	return field;
 }

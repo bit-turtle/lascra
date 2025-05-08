@@ -1,0 +1,14 @@
+(declare
+  (name "Function Example")
+)
+(# The difference between a function and a procedure is that a function runs without screen refresh)
+(function func (This is a function which takes a number (number num) a string (string str) and a boolean (boolean bool) )
+  (# Strings and Numbers are treated identically, following scratch's behavior)
+  (say (join
+    (join "Number: " (argument num) )
+    (join
+      (join "String: " (argument str) )
+      (join "Bool: " (argument bool) )
+    )
+  ) )
+)

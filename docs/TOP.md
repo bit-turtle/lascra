@@ -1,8 +1,10 @@
 # Top Level Statements
-There are only 3 top level statements
+There are 5 different top level statements
 1. `declare` properties for the sprite
 2. `define` variables, lists, and broadcasts for the sprite
 3. Run code `when` an event happens
+4. Define a `procedure`
+5. Define a `function` which runs without screen refresh
 ## Declare statements
 Many sprite properties can be modified with declare statements. List of properties:
 * `name`: Sprite Name *string*
@@ -66,5 +68,23 @@ When statements are used to run code when a certain event happens. List of event
 )
 (when (received MyBroadcast)
   (say "Received Broadcast!")
+)
+```
+## Procedure and Function Statements
+Procedures and Functions are identical except for the fact that functions run without screen
+refresh.
+### Procedure Structure
+`(procedure Name (arguments) code...)`
+### Procedure Arguments
+Either text or arguments can be entered into the arguments section, argument types:
+* `(number Name)`
+* `(string Name)`
+* `(boolean Name)`
+### Example Procedure
+```
+(procedure say_if (Say (string message) if (boolean condition) )
+    (if (argument condition)
+        (say (argument message) )
+    )
 )
 ```
