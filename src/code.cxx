@@ -15,6 +15,7 @@ std::string substack(bparser::node& sprite, bparser::node& param, int offset, st
 	// Build substack
 	bparser::node* prevnode = &sprite.find("blocks").find(parentid);
 	std::string previd = parentid;
+  bool first = true;
 	for (int i = offset; i < param.size(); i++) {
 		try {
 			if (param[i].value == "#") continue;
@@ -33,7 +34,8 @@ std::string substack(bparser::node& sprite, bparser::node& param, int offset, st
 				previf = nullptr;
 				rootif = nullptr;
 			}
-			if (i == offset) startid = nextid;
+			if (first) startid = nextid;
+      first = false;
 		}
 		catch (std::exception& e) { throw error(i, e); }
 	}
@@ -423,33 +425,17 @@ std::string else_then(bparser::node& sprite, bparser::node& param, bparser::node
 std::string repeat(bparser::node& sprite, bparser::node& param) {
 	if (param.size() < 1) throw error("Expected 1 or more parameters");
 	std::string id = id::get("repeat");
-	bparser::node& repeat = block(id, "control_repeat", false);
-	repeat.find("inputs").push(&parameter_number(sprite, param[0], id, true, true)).value = "TIMES";
+	bparser::node& repeat = block(id, (param.value == "repeat") ? "control_repeat" : "control_repeat_until", false);
 	sprite.find("blocks").push(&repeat);
-	// Build substack
+	if (param.value == "repeat") repeat.find("inputs").push(&parameter_number(sprite, param[0], id, true, true)).value = "TIMES";
+  else repeat.find("inputs").push(&parameter_bool(sprite, param[0], id)).value = "CONDITION";
+  // Build substack
 	if (param.size() > 1) {
 		bparser::node& sub = repeat.find("inputs").emplace("SUBSTACK");
 		sub.emplace("2");
 		sub.emplace(substack(sprite, param, 1, id));
 	}
 	repeat.find("next")[0].value = "null";
-
-	return id;
-}
-std::string repeat_until(bparser::node& sprite, bparser::node& param) {
-	if (param.size() < 1) throw error("Expected 1 or more parameters");
-	std::string id = id::get("repeat");
-	bparser::node& repeat = block(id, "control_repeat_until", false);
-	repeat.find("inputs").push(&parameter_bool(sprite, param[0], id)).value = "CONDITION";
-	sprite.find("blocks").push(&repeat);
-	// Build substack
-	if (param.size() > 1) {
-		bparser::node& sub = repeat.find("inputs").emplace("SUBSTACK");
-		sub.emplace("2");
-		sub.emplace(substack(sprite, param, 1, id));
-	}
-	repeat.find("next")[0].value = "null";
-
 	return id;
 }
 std::string forever(bparser::node& sprite, bparser::node& param) {
@@ -766,8 +752,7 @@ std::string code(bparser::node& sprite, bparser::node& code, bparser::node* prev
 		else if (code.value == "if") return if_then(sprite, code);
 		else if (code.value == "elif") return elif_then(sprite, code, previf);
 		else if (code.value == "else") return else_then(sprite, code, previf);
-		else if (code.value == "repeat") return repeat(sprite, code);
-		else if (code.value == "repeat_until") return repeat_until(sprite, code);
+		else if (code.value == "repeat" || code.value == "repeat_until") return repeat(sprite, code);
 		else if (code.value == "forever") return forever(sprite, code);
 		else if (code.value == "stop") return stop(sprite, code);
 		else if (code.value == "clone") return clone(sprite, code);
