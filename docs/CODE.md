@@ -4,7 +4,7 @@ Code statements describe the code blocks
 ```
 (say "Hi!")
 ```
-Here `say` is a block which accepts a string parameter as an input `PARAM.md`
+Here `say` is a block which accepts a [parameter](PARAM.md) as an input
 ## List of blocks
 ### Motion
 * (move *number*)
@@ -43,10 +43,11 @@ Here `say` is a block which accepts a string parameter as an input `PARAM.md`
 * (set_size *size*)
 ### Events
 * (broadcast *broadcastName*)
+  - [Broadcast Documentation](TOP.md#define-statements)
 * (broadcast_wait *broadcastName*)
 ### Control
 * (wait *seconds*)
-* (wait_until *condition*)
+* (wait_until *value*)
 * Conditionals:
   - (if *condition* *code...*)
   - (elif *condition* *code...*)
@@ -85,7 +86,7 @@ Here `say` is a block which accepts a string parameter as an input `PARAM.md`
   - (show_list *listName*)
   - (hide_list *listName*)
 ### My Blocks
-* (call *procedureName* *arguments...*)
+* (call *procedureName* *arguments...*) [Procedure Documentation](TOP.md#procedure-and-function-statements)
 ### Extentions
 #### Pen
 * (pen_up)
