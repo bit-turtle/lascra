@@ -1,0 +1,12 @@
+(declare
+	(name "Issue#1 Example")
+)
+(define
+	(list test)
+	(variable test)
+)
+(when flag
+	(# Previously Wouldn't Compile)
+	(add "" test)
+	(set test "")
+)

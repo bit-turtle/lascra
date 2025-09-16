@@ -651,8 +651,7 @@ bparser::node& parameter_color(bparser::node& sprite, bparser::node& code, std::
 	bparser::node& input = *(new bparser::node(""));
 	input.emplace(((param) ? "3" : "1"));
 	if (param) {
-    bparser::node& parameter = input.emplace("");
-    parameter_generic(sprite, code, parameter, parentid);
+    parameter_generic(sprite, code, input, parentid);
 	}
   //Input validaton
   if (!param) {

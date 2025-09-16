@@ -70,12 +70,20 @@ Here `say` is a block which accepts a string parameter as an input `PARAM.md`
   - `true`
   - `false`
 ### Data
-* (set *variableName* *string*)
-* (change *variableName* *number*)
-* (show_variable *variableName*)
-* (hide_variable *variableName*)
-* (show_list *listName*)
-* (hide_list *listName*)
+* Variables:
+  - (set *variableName* *value*)
+  - (change *variableName* *number*)
+* Lists:
+  - (add *value* *listName*)
+  - (delete *index* *listName*)
+  - (delete_all *listName*)
+  - (insert *value* *index* *listName*)
+  - (replace *index* *listName* *value*)
+* Display:
+  - (show_variable *variableName*)
+  - (hide_variable *variableName*)
+  - (show_list *listName*)
+  - (hide_list *listName*)
 ### My Blocks
 * (call *procedureName* *arguments...*)
 ### Extentions
