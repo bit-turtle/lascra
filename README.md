@@ -1,8 +1,8 @@
 # lascra (Lisp and Scratch)
 lascra is a compiler that compiles a lisp like language into scratch sprite3 files
 ## Information
-* Documentation in `docs` folder
-* Examples in the `examples` folder
+* Documentation in [`docs`](docs/TOP.md) folder
+* Examples in the [`examples`](examples/) folder
 * All base scratch blocks are supported
 * Some blocks from extensions are supported
   - Pen extension is fully supported
@@ -14,7 +14,7 @@ lascra is a compiler that compiles a lisp like language into scratch sprite3 fil
 * Compiles code files
 * Adds generated code into `sprite.json` and saves `sprite.sprite3`
 ## Example Usage
-1. Export a Sprite in the scratch editor called "MySprite"
+1. Export a Sprite in the scratch editor called "MySprite"  
 ![Export Sprite](images/export.png)
 2. Run `lascra MySprite.sprite3 examples/example.scra`
 Contents of `example.scra`:
@@ -62,8 +62,8 @@ Contents of `example.scra`:
     )
 )
 ```
-3. Upload the edited Sprite file in the scratch editor
+3. Upload the edited Sprite file in the scratch editor  
 ![Upload Sprite](images/upload.png)
 
-This results in the following code:
+This results in the following code:  
 ![Resulting Code](images/example.png)
