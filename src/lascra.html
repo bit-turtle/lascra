@@ -137,7 +137,7 @@
 				<select id="remove">
 					<option value="lascra">Remove lascra-generated code</option>
 					<option value="keep">Keep all code</option>
-					<option value="erase">Erase all code</option>
+					<option value="remove">Remove all code</option>
 				</select>
 				<br />
 				<label for="code">Code Files:</label>
@@ -347,7 +347,7 @@
 					args.push(name.value);
 				}
 				if (remove.value == "keep") args.push("-k");
-				else if (remove.value == "erase") args.push("-e");
+				else if (remove.value == "remove") args.push("-r");
 				if (list.checked) args.push("-l");
 				if (display.checked) args.push("-d");
 				for (let file = 0; file < code.files.length; file++) {
