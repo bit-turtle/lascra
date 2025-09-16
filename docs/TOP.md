@@ -5,7 +5,9 @@ There are 5 different top level statements
 3. Run code `when` an event happens
 4. Define a `procedure`
 5. Define a `function` which runs without screen refresh
-## Declare statements
+## Declare Statements
+`(declare (property value)... )`
+### Declare Properties
 Many sprite properties can be modified with declare statements. List of properties:
 * `name`: Sprite Name *string*
 * `layerOrder`: Layer Number *number*
@@ -29,6 +31,7 @@ Many sprite properties can be modified with declare statements. List of properti
     - `on-flipped`
   * `videoTransparency`: Video Transparency % *number*
   * `textToSpeechLanguage`: Text to Speech Language *string* (Language Code)
+### Example Declare Statement
 ```
 (declare
   (name "MySprite")
@@ -43,10 +46,12 @@ Many sprite properties can be modified with declare statements. List of properti
 )
 ```
 ## Define Statements
+`(define (type name value)... )`
 Variables, lists, and broadcasts are created with define statements. List of definitions:
 * `variable`: Define a variable with an optional value
 * `list`: Define a list, optionally with some values.
 * `broadcast`: Define a broadcast
+### Example Define Statement
 ```
 (define
   (variable MyVariable 0)
@@ -55,10 +60,13 @@ Variables, lists, and broadcasts are created with define statements. List of def
 )
 ```
 ## When Statements
+`(when event code...)`
+[Code Documentation](CODE.md)  
 When statements are used to run code when a certain event happens. List of events:
 * `flag`: Green Flag Pressed
 * `clicked`: Sprite Clicked
 * `(received broadcastName)`: Broadcast Received
+### Example When Statement
 ```
 (when flag
   (say "Green Flag Pressed!")
@@ -75,6 +83,8 @@ Procedures and Functions are identical except for the fact that functions run wi
 refresh.
 ### Procedure Structure
 `(procedure Name (arguments) code...)`
+`(function Name (arguments) code...)`
+[Code Documentation](CODE.md)  
 ### Procedure Arguments
 Either text or arguments can be entered into the arguments section, argument types:
 * `(number Name)`
