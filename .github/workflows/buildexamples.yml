@@ -26,5 +26,5 @@ jobs:
     - name: Compile Examples
       run: |
         for example in $EXAMPLES; do
-          ${{github.workspace}}/build/src/lascra ${{github.workspace}}/test/test.sprite3 -r ${example}
+          ${{github.workspace}}/build/src/lascra ${{github.workspace}}/test.sprite3 -r ${example}
         done  
