@@ -1,12 +1,14 @@
 # lascra (Lisp and Scratch)
-lascra is a compiler that compiles a lisp like language into scratch sprite3 files
+lascra is a compiler that compiles a lisp like language into scratch sprite3 files  
+
+[![Build and Compile Examples](https://github.com/bit-turtle/lascra/actions/workflows/buildexamples.yml/badge.svg)](https://github.com/bit-turtle/lascra/actions/workflows/buildexamples.yml)
 ## Information
 * Documentation in [`docs`](docs/STRUCTURE.md) folder
 * Examples in the [`examples`](examples/) folder
 * All base scratch blocks are supported
 * Some blocks from extensions are supported
   - Pen extension is fully supported
-* A web version can be compiled using Emscripten
+* A web version can be compiled using Emscripten  
 ## Usage
 `lascra sprite.sprite3 [code files...]`
 * Opens `sprite.json` in `sprite.sprite3`
