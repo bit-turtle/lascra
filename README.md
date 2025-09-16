@@ -1,7 +1,7 @@
 # lascra (Lisp and Scratch)
 lascra is a compiler that compiles a lisp like language into scratch sprite3 files
 ## Information
-* Documentation in [`docs`](docs/TOP.md) folder
+* Documentation in [`docs`](docs/STRUCTURE.md) folder
 * Examples in the [`examples`](examples/) folder
 * All base scratch blocks are supported
 * Some blocks from extensions are supported
