@@ -10,6 +10,8 @@
 #include <string>
 #include <sstream>
 
+#include <iostream>
+
 #include "procedure.hxx"
 
 void parameter_argument(bparser::node& sprite, bparser::node& code, bparser::node& node, std::string parentid) {
@@ -712,18 +714,20 @@ bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std:
 			throw error(name, e);
 		}
 	}
-	bparser::node& shadow = block(id::get(name), opcode, false, true);
-	parent(shadow, parentid);
-	if (acceptAll) shadow.find("fields").push(&field_parameter(code, noNull)).value = field;
-  else shadow.find("fields").push(&field_parameter(code, values, param, noNull)).value = field;
-	sprite.find("blocks").push(&shadow);
-	input.emplace(shadow.value);
+	else {
+		bparser::node& shadow = block(id::get(name), opcode, false, true);
+		parent(shadow, parentid);
+		if (acceptAll) shadow.find("fields").push(&field_parameter(code, noNull)).value = field;
+	  else shadow.find("fields").push(&field_parameter(code, values, param, noNull)).value = field;
+		sprite.find("blocks").push(&shadow);
+		input.emplace(shadow.value);
+	}
 	return input;
 }
 
 bparser::node& field_parameter(bparser::node& code, bool noNull) {
-  if (code.size() != 0) throw error("Invalid value");
   bparser::node& field = *(new bparser::node(""));
+  if (code.size() != 0) throw error("Invalid value");
   field.emplace(code.value).string = true;
   if (!noNull) field.emplace("null");
   return field;
