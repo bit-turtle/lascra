@@ -16,7 +16,7 @@ jobs:
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
     - name: Build Lascra
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-    - name: Get Example
+    - name: Get Examples
       run: |
         {
           echo 'EXAMPLES<<EOF'
