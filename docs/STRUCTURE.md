@@ -1,11 +1,8 @@
 # File Structure (`.scra` files)
 The code files for lascra are organized into 3 different layers
-1. Top Level Statements which structure the sprite as a whole `TOP.md`
-  - `define` variables, lists, and broadcasts
-  - `declare` sprite information
-  - Run code `when` and event happens
-2. Code Statements which describe a code block to be run inside of a `when` statement `CODE.md`
-3. Parameter Statements which are passed to code statements `PARAM.md`
+1. [Top Level Statements](TOP.md) which structure the sprite as a whole
+2. [Code Statements](CODE.md) which describe block of code inside of a `when` or `procedure`/`function` top level statement
+3. [Parameter Statements](PARAM.md) which are passed to code statements
 ## Example
 ```
 (when flag
