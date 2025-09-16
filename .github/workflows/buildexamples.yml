@@ -16,13 +16,13 @@ jobs:
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
     - name: Build Lascra
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-    - name: Get Examples
-        run: |
-          {
-            echo 'EXAMPLES<<EOF'
-            find ${{github.workspace}}/examples -name '*.scra' -print
-            echo EOF
-          } >> "$GITHUB_ENV"
+    - name: Get Example
+      run: |
+        {
+          echo 'EXAMPLES<<EOF'
+          find ${{github.workspace}}/examples -name '*.scra' -print
+          echo EOF
+        } >> "$GITHUB_ENV"
     - name: Compile Examples
       run: |
         for example in $EXAMPLES; do
