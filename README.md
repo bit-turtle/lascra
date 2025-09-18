@@ -10,11 +10,14 @@ lascra is a compiler that compiles a lisp like language into scratch sprite3 fil
   - Pen extension is fully supported
 * A web version can be compiled using Emscripten  
 ## Usage
-`lascra *.sprite3/sb3 (--sprite name) [--remove,--keep] codeFiles...`
+`lascra *.sprite3 (--sprite spriteName) [--remove,--keep] codeFiles...`
 * Opens `sprite.json` in `sprite.sprite3`
+  - `--sprite spriteName`: Opens the `spriteName` sprite in `project.json` in `project.sb3`
 * Deletes existing lascra-generated code
+  - `--remove`: Removes all existing code
+  - `--keep`: Keeps all existing code
 * Compiles code files
-* Adds generated code into `sprite.json` and saves `sprite.sprite3`
+* Save generated code
 ## Example Usage
 1. Export a Sprite in the scratch editor called "MySprite"  
 ![Export Sprite](images/export.png)
