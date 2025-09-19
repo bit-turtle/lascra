@@ -71,4 +71,5 @@ Contents of `example.scra`:
 ![Upload Sprite](images/upload.png)
 
 This results in the following code:  
-![Resulting Code](images/example.png)
+![Function](images/function.png)  
+![When Flag](images/flag.png)
