@@ -14,10 +14,6 @@
 
 #include "procedure.hxx"
 
-void parameter_argument(bparser::node& sprite, bparser::node& code, bparser::node& node, std::string parentid) {
-
-}
-
 void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node& node, std::string parentid) {
 	// Type
   if (code.value == "argument") {
