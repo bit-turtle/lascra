@@ -1,0 +1,12 @@
+(declare
+	(name "Issue#2 Example")
+)
+(define
+	(broadcast helloworld)
+)
+(when (received helloworld)
+	(say "Hello World!")
+)
+(when flag
+	(broadcast (join "hello" "world") )
+)

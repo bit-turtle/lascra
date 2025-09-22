@@ -452,25 +452,25 @@ std::string forever(bparser::node& sprite, bparser::node& param) {
 // Events
 std::string send_broadcast(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 1) throw error("Expected 1 parameter");
-	std::string id = id::get("move");
+	std::string id = id::get("broadcast");
 	bparser::node& broadcast = block(id, (code.value == "broadcast") ? "event_broadcast" : "event_broadcastandwait", false);
-	bparser::node& input = broadcast.find("inputs").emplace("BROADCAST_INPUT");
-	input.emplace("1");
-	bparser::node& broadcastinput = input.emplace("");
-	broadcastinput.emplace("11");
-	broadcastinput.emplace(code[0].value).string = true;
-	// broadcastinput.emplace(find_broadcast(sprite, code[0].value));
-	broadcast.find("inputs").push(&parameter_string(sprite, code[0], id)).value = "VALUE";
+	broadcast.find("inputs").push(&parameter_broadcast(sprite, code[0], id)).value = "BROADCAST_INPUT";
 	sprite.find("blocks").push(&broadcast);
 	return id;
 }
+// Control
 std::string stop(bparser::node& sprite, bparser::node& param) {
 	if (param.size() != 1) throw error("Expected 1 parameter");
 	std::string id = id::get("stop");
 	bparser::node& stop = block(id, "control_stop", false);
-	bparser::node& option = stop.find("fields").emplace("STOP_OPTION");
-	option.emplace(param[0].value).string = true;
-	option.emplace("null");
+	stop.find("fields").push(&field_parameter(param[0],{
+		{"all", "all"},
+		{"this", "this script"},
+		{"other", "other scripts in sprite"},
+		// Last two are for backwards compatibility
+		{"this script", "this script"},
+		{"other scripts in sprite", "other scripts in sprite"}
+	})).value = "STOP_OPTION";
 	sprite.find("blocks").push(&stop);
 	return id;
 }

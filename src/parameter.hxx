@@ -31,6 +31,9 @@ bparser::node& parameter_number(bparser::node& sprite, bparser::node& code, std:
 // Boolean parameter, Accepts boolean blocks
 bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::string parentid);
 
+// Broadcast Parameter, Accepts string or generic parameters
+bparser::node& parameter_broadcast(bparser::node& sprite, bparser::node& code, std::string parentid);
+
 // Color Parameter, Accepts hex (#ffffff) or generic parameters
 bparser::node& parameter_color(bparser::node& sprite, bparser::node& code, std::string parentid);
 

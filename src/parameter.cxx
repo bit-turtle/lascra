@@ -644,6 +644,20 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 	return node;
 }
 
+bparser::node& parameter_broadcast(bparser::node& sprite, bparser::node& code, std::string parentid) {
+	bool param = (code.size() == 0) ? false : true;
+	bparser::node& input = *(new bparser::node(""));
+	input.emplace(((param) ? "3" : "1"));
+	if (param) {
+    parameter_generic(sprite, code, input, parentid);
+	}
+  bparser::node& color = input.emplace("");
+  color.emplace("11");
+  color.emplace((param) ? "lascra" : code.value);
+  // Return parameter
+	return input;
+}
+
 bparser::node& parameter_color(bparser::node& sprite, bparser::node& code, std::string parentid) {
 	bool param = (code.size() == 0) ? false : true;
 	bparser::node& input = *(new bparser::node(""));
