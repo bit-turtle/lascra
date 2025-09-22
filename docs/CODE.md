@@ -58,7 +58,9 @@ Here `say` is a block which accepts a [parameter](PARAM.md) as an input
 * (repeat_until *condition* *code...*)
 * (forever *code...*)
 * (stop *what*)
-  - Same as scratch, example: `(stop all)`
+  - `all`
+  - `this`, `this script`
+  - `other`, `other scripts in sprite`
 * (clone *spriteName*)
   - Myself is: `_myself_`
   - `(clone _myself_)`
