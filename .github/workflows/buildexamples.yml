@@ -27,4 +27,9 @@ jobs:
       run: |
         for example in $EXAMPLES; do
           ${{github.workspace}}/build/src/lascra ${{github.workspace}}/test.sprite3 -r ${example}
-        done  
+        done
+    - name: Upload Lascra
+      uses: actions/upload-artifact@v4.6.2
+      with:
+        name: lascra-linux
+        path: ${{github.workspace}}/build/src/lascra
