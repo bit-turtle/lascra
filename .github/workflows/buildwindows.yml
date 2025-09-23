@@ -33,4 +33,4 @@ jobs:
       uses: actions/upload-artifact@v4.6.2
       with:
         name: lascra-windows
-        path: ${{github.workspace}}\build\Release\lascra.exe
+        path: ${{github.workspace}}\build\src\Release\lascra.exe
