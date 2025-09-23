@@ -12,6 +12,7 @@
 #include <sstream>
 
 #include <iostream>
+#include <type_traits>
 
 #include "procedure.hxx"
 #include "macro.hxx"
@@ -477,11 +478,14 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 bparser::node& parameter_string(bparser::node& sprite, bparser::node& code, std::string parentid) {
 	bparser::node& node = *(new bparser::node(""));
 	// Use value if no subnodes
-	if (code.size() == 0 || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)) {
+	if (code.size() == 0
+	    || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)
+	    || (code.value == "macro" && code.size() == 1 && code[0].size() == 0 && macro(code, false).size() == 0)
+	) {
 		node.emplace("1");
 		bparser::node& inner = node.emplace("");
 		inner.emplace("10");
-		inner.emplace(code.size() == 0 ? code.value : macro_parameter(code[0].value).value).string = true;
+		inner.emplace(code.size() == 0 ? code.value : (code.value == "parameter" ? macro_parameter(code[0].value).value : macro(code, false).value)).string = true;
 		return node;
 	}
 	else {
@@ -499,8 +503,11 @@ bparser::node& parameter_string(bparser::node& sprite, bparser::node& code, std:
 bparser::node& parameter_number(bparser::node& sprite, bparser::node& code, std::string parentid, bool positive, bool integer, bool angle) {
 	bparser::node& node = *(new bparser::node(""));
 	// Use value if no subnodes 
-	if (code.size() == 0 || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)) {
-		std::string& number = code.size() == 0 ? code.value : macro_parameter(code[0].value).value;
+	if (code.size() == 0
+	    || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)
+	    || (code.value == "macro" && code.size() == 1 && macro(code, false).size() == 0)
+	) {
+		std::string& number = code.size() == 0 ? code.value : (code.value == "parameter" ? macro_parameter(code[0].value).value : macro(code, false).value);
 		node.emplace("1");
 		bparser::node& inner = node.emplace("");
 		if (!positive && !integer) {
@@ -701,7 +708,9 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 }
 
 bparser::node& parameter_broadcast(bparser::node& sprite, bparser::node& code, std::string parentid) {
-	bool param = (code.size() == 0 || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)) ? false : true; 
+	bool param = (code.size() == 0
+	              || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)
+	              || (code.value == "macro" && code.size() == 1 && code[0].size() == 0 && macro(code).size() == 0)) ? false : true; 
 	bparser::node& input = *(new bparser::node(""));
 	input.emplace((param ? "3" : "1"));
 	if (param) {
@@ -709,13 +718,15 @@ bparser::node& parameter_broadcast(bparser::node& sprite, bparser::node& code, s
 	}
   bparser::node& color = input.emplace("");
   color.emplace("11");
-  color.emplace(param ? "lascra" : (code.size() == 0 ? code.value : macro_parameter(code[0].value).value));
+  color.emplace(param ? "lascra" : (code.size() == 0 ? code.value : (code.value == "macro" ? macro_parameter(code[0].value).value : macro(code, false).value)));
   // Return parameter
 	return input;
 }
 
 bparser::node& parameter_color(bparser::node& sprite, bparser::node& code, std::string parentid) {
-	bool param = (code.size() == 0 || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)) ? false : true;
+	bool param = (code.size() == 0
+	              || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)
+	              || (code.value == "macro" && code.size() == 1 && code[0].size() == 0 && macro(code, false).size() == 0)) ? false : true;
 	bparser::node& input = *(new bparser::node(""));
 	input.emplace(((param) ? "3" : "1"));
 	if (param) {
@@ -724,7 +735,7 @@ bparser::node& parameter_color(bparser::node& sprite, bparser::node& code, std::
   //Input validaton
   if (!param) {
     std::istringstream hex;
-    hex.str(code.size() == 0 ? code.value : macro_parameter(code[0].value).value);
+    hex.str(code.size() == 0 ? code.value : (code.value == "parameter" ? macro_parameter(code[0].value).value : macro(code, false).value));
     int n = 0;
     char c;
     while (hex.get(c)) {
@@ -768,7 +779,9 @@ bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std:
 }
 
 bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std::string parentid, std::string name, std::string opcode, std::string field, std::map<std::string,std::string> values, bool acceptAll, bool noNull) {
-	bool param = (code.size() == 0 || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)) ? false : true;
+	bool param = (code.size() == 0
+	              || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)
+	              || (code.value == "macro" && code.size() == 1 && code[0].size() == 0 && macro(code, false).size() == 0)) ? false : true;
 	bparser::node& input = *(new bparser::node(field));
 	input.emplace(((param) ? "3" : "1"));
 	if (param) {
@@ -783,8 +796,8 @@ bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std:
 	else {
 		bparser::node& shadow = block(id::get(name), opcode, false, true);
 		parent(shadow, parentid);
-		if (acceptAll) shadow.find("fields").push(&field_parameter(code.size() == 0 ? code : macro_parameter(code[0].value), noNull)).value = field;
-	  else shadow.find("fields").push(&field_parameter(code.size() == 0 ? code : macro_parameter(code[0].value), values, param, noNull)).value = field;
+		if (acceptAll) shadow.find("fields").push(&field_parameter(code.size() == 0 ? code : (code.value == "parameter" ? macro_parameter(code[0].value) : macro(code, false)), noNull)).value = field;
+	  else shadow.find("fields").push(&field_parameter(code.size() == 0 ? code : (code.value == "parameter" ? macro_parameter(code[0].value) : macro(code, false)), values, param, noNull)).value = field;
 		sprite.find("blocks").push(&shadow);
 		input.emplace(shadow.value);
 	}

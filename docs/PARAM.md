@@ -40,6 +40,7 @@ The parameter statement in `say` is `join`, which takes in two parameter stateme
 * (parameter *parameterName*)
   - Can only be used inside of a macro
   - [Macro Documentation](TOP.md#macro-statements)
+* (macro *macroName* *parameters...*)
 ## Boolean Parameters
 * (and *boolean* *boolean*)
 * (or *boolean* *boolean*)

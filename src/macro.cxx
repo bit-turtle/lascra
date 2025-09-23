@@ -53,7 +53,7 @@ void define_macro(bparser::node& code) {
 	}
 }
 
-bparser::node& macro(bparser::node& code) {
+bparser::node& macro(bparser::node& code, bool add) {
 	if (code.size() == 0)
 		throw error("Expected at least one parameter");
 	if (code[0].size() != 0)
@@ -69,11 +69,13 @@ bparser::node& macro(bparser::node& code) {
 			paramcopy.pop();
 		}
 	}
-	if (code.size()-1 > macro.params.size())
-		throw error("Incorrect number of parameters");
-	params.push({&macro, {}});
-	for (int p = 1; p <= macro.params.size(); p++) {
-		params.top().params.push_back(&code[p]);
+	if (add) {
+		if (code.size()-1 > macro.params.size())
+			throw error("Incorrect number of parameters");
+		params.push({&macro, {}});
+		for (int p = 1; p <= macro.params.size(); p++) {
+			params.top().params.push_back(&code[p]);
+		}
 	}
 	return *macro.macro;
 }

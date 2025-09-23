@@ -100,7 +100,7 @@ Either text or arguments can be entered into the arguments section, argument typ
 )
 ```
 ## Macro Statements
-Macros declare a block of code that returns a value and can take parameters. Macros can be used as parameters to any block.
+Macros declare a block of code that returns a value and can take parameters. Macros can be used as parameters to any block. Macros with no parameters can be used as constants.
 ### Macro Structure
 `(macro (name parameters...) code)`
 ### Example Macro
@@ -108,4 +108,5 @@ Macros declare a block of code that returns a value and can take parameters. Mac
 (macro (hello name)
     (join "Hello, " (parameter name) )
 )
+(macro PI 3.14159)
 ```

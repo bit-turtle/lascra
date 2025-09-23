@@ -1,7 +1,6 @@
 // lascra define
 
 #include "define.hxx"
-#include <sstream>
 #include <stdexcept>
 
 #include "id.hxx"
@@ -11,10 +10,13 @@ void variable(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 1 && code.size() != 2) {
 		throw error("Wrong number of parameters (Expected 1 or 2)");
 	}
+	if (code[0].size() != 0)
+		throw error("Expected string");
 	bparser::node* var = new bparser::node(id::get(code[0].value));
 	var->emplace(code[0].value).string = true;
 	if (code.size() == 2) {
-
+		if (code[1].size() != 0)
+			throw error("Expected string");
 		var->emplace(code[1].value);
 	}
 	else {
@@ -30,10 +32,14 @@ void list(bparser::node& sprite, bparser::node& code) {
 	if (code.size() < 1) {
 		throw error("Wrong number of parameters (Expected at least 1)");
 	}
+	if (code[0].size() != 0)
+		throw error("Expected string");
 	bparser::node* list = new bparser::node(id::get(code[0].value));
 	list->emplace(code[0].value).string = true;
 	bparser::node* arr = new bparser::node("");
 	for (int i = 1; i < code.size(); i++) {
+		if (code[1].size() != 0)
+			throw error("Expected string");
 		arr->emplace(code[i].value);
 	}
   // Global Flag
@@ -47,6 +53,8 @@ void broadcast(bparser::node& sprite, bparser::node& code) {
 	if (code.size() != 1) {
 		throw error("Wrong number of parameters (Expected 1)");
 	}
+	if (code[0].size() != 0)
+		throw error("Expected string");
 	sprite.find("broadcasts").emplace(id::get(code[0].value)).emplace(code[0].value);
 }
 
