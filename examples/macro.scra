@@ -1,0 +1,28 @@
+(declare
+	(name "Macro Example")
+)
+(macro (hello name)
+	(join "Hello, " (join (parameter name) "!" ) )
+)
+(macro (area_of_triangle base height)
+	(/ (* (parameter base) (parameter height) ) 2)
+)
+(when flag
+	(# Example 1)
+	(say (macro hello (value username) ) )
+	(say (macro hello "Bob") )
+	(say (macro hello "World") )
+	(# Example 2)
+	(say (macro area_of_triangle 2 2) )
+	(say (macro area_of_triangle 4 8) )
+	(say (macro area_of_triangle 6 3) )
+)
+
+
+(# Cyclic Macros (Causes an error)
+	(macro 1 (join "Macro 1" (macro 2) ) )
+	(macro 2 (join "Macro 2" (macro 1) ) )
+	(when flag
+		(say (macro 1) )
+	)
+)

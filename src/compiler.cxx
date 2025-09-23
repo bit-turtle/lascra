@@ -11,6 +11,7 @@
 #include "declare.hxx"
 #include "define.hxx"
 #include "when.hxx"
+#include "macro.hxx"
 
 #include "procedure.hxx"
 
@@ -41,14 +42,20 @@ void compile(bparser::node& sprite, bparser::node& code) {
 				throw error(i, "when", e);
 			}
 		}
-		else if (code[i].value == "procedure" || code[i].value == "function") {   // function means run
-                                                                              // without screen
-                                                                              // refresh
+		else if (code[i].value == "procedure" || code[i].value == "function") {   // function means run without screen refresh
 			try {
 				procedure(sprite, code[i]);
 			}
 			catch (std::exception& e) {
 				throw error(i, "procedure", e);
+			}
+		}
+		else if (code[i].value == "macro") {
+			try {
+				define_macro(code[i]);
+			}
+			catch (std::exception& e) {
+				throw error(i, "macro", e);
 			}
 		}
 		else {

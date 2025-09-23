@@ -7,12 +7,14 @@
 #include "block.hxx"
 #include "id.hxx"
 
+#include <exception>
 #include <string>
 #include <sstream>
 
 #include <iostream>
 
 #include "procedure.hxx"
+#include "macro.hxx"
 
 void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node& node, std::string parentid) {
 	// Type
@@ -31,6 +33,28 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
     parent(reporter, parentid);
     sprite.find("blocks").push(&reporter);
     node.emplace(reporter.value);
+  }
+  // Macros
+  else if (code.value == "macro") {
+  	if (code.size() < 1)
+  		throw error("Expected macro name");
+  	try {
+  		parameter_generic(sprite, macro(code), node, parentid);
+	  	end_macro();
+  	}
+  	catch (std::exception& e) {
+  		throw error(code[0].value, e);
+  	}
+  }
+  else if (code.value == "parameter") {
+  	if (code.size() != 1 || code[0].size() != 0)
+  		throw error("Expected macro parameter name");
+  	try {
+	  	parameter_generic(sprite, macro_parameter(code[0].value), node, parentid);
+	  }
+	  catch (std::exception& e) {
+	  	throw error(code[0].value, e);
+	  }
   }
   else if (code.value == "bool") {
 		node.push(&parameter_bool(sprite, code[0], parentid)).erase(0);
@@ -443,17 +467,22 @@ void parameter_generic(bparser::node& sprite, bparser::node& code, bparser::node
 		sprite.find("blocks").push(motorpos);
 		node.emplace(motorposid);
 	}
-	else throw error("Unknown type");
+	else {
+		std::ostringstream err;
+		err << "Unknown type: " << code.value;
+		throw error(err.str());
+	}
 }
 
 bparser::node& parameter_string(bparser::node& sprite, bparser::node& code, std::string parentid) {
 	bparser::node& node = *(new bparser::node(""));
 	// Use value if no subnodes
-	if (code.size() == 0) {
+	if (code.size() == 0 || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)) {
 		node.emplace("1");
 		bparser::node& inner = node.emplace("");
 		inner.emplace("10");
-		inner.emplace(code.value).string = true;
+		inner.emplace(code.size() == 0 ? code.value : macro_parameter(code[0].value).value).string = true;
+		return node;
 	}
 	else {
 		node.emplace("3");
@@ -469,27 +498,28 @@ bparser::node& parameter_string(bparser::node& sprite, bparser::node& code, std:
 }
 bparser::node& parameter_number(bparser::node& sprite, bparser::node& code, std::string parentid, bool positive, bool integer, bool angle) {
 	bparser::node& node = *(new bparser::node(""));
-	// Use value if no subnodes
-	if (code.size() == 0) {
+	// Use value if no subnodes 
+	if (code.size() == 0 || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)) {
+		std::string& number = code.size() == 0 ? code.value : macro_parameter(code[0].value).value;
 		node.emplace("1");
 		bparser::node& inner = node.emplace("");
 		if (!positive && !integer) {
 			inner.emplace(angle ? "8" : "4");
-			if (!checknum(code.value)) throw error("Expected number");
+			if (!checknum(number)) throw error("Expected number");
 		}
 		else if (positive && !integer) {
 			inner.emplace("5");
-			if (!checknum(code.value, true)) throw error("Expected positive number");
+			if (!checknum(number, true)) throw error("Expected positive number");
 		}
 		else if (!positive && integer) {
 			inner.emplace("7");
-			if (!checknum(code.value, false, true)) throw error("Expected integer");
+			if (!checknum(number, false, true)) throw error("Expected integer");
 		}
 		else if (positive && integer) {
 			inner.emplace("6");
-			if (!checknum(code.value, true, true)) throw error("Expected positive integer");
+			if (!checknum(number, true, true)) throw error("Expected positive integer");
 		}
-		inner.emplace(code.value).string = true;
+		inner.emplace(number).string = true;
 	}
 	else {
 		node.emplace("3");
@@ -525,6 +555,32 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
     bparser::node& value = boolean->find("fields").emplace("VALUE");
     value.emplace(arg.value).string = true;
     value.emplace("null");
+  }
+  // Macros
+  else if (code.value == "macro") {
+  	if (code.size() < 1)
+  		throw error("Expected macro name");
+  	try {
+	  	bparser::node* old = &node;
+  		parameter_bool(sprite, macro(code), parentid);
+	  	end_macro();
+	  	delete old;
+  	}
+  	catch (std::exception& e) {
+  		throw error(code[0].value, e);
+  	}
+  }
+  else if (code.value == "parameter") {
+  	if (code.size() != 1 || code[0].size() != 0)
+  		throw error("Expected macro parameter name");
+  	try {
+	  	bparser::node* old = &node;
+	  	node = parameter_bool(sprite, macro_parameter(code[0].value), parentid);
+	  	delete old;
+	  }
+	  catch (std::exception& e) {
+	  	throw error(code[0].value, e);
+	  }
   }
   else if (code.value == "and") {
 		if (code.size() != 2) throw error("Expected 2 parameters");
@@ -645,21 +701,21 @@ bparser::node& parameter_bool(bparser::node& sprite, bparser::node& code, std::s
 }
 
 bparser::node& parameter_broadcast(bparser::node& sprite, bparser::node& code, std::string parentid) {
-	bool param = (code.size() == 0) ? false : true;
+	bool param = (code.size() == 0 || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)) ? false : true; 
 	bparser::node& input = *(new bparser::node(""));
-	input.emplace(((param) ? "3" : "1"));
+	input.emplace((param ? "3" : "1"));
 	if (param) {
     parameter_generic(sprite, code, input, parentid);
 	}
   bparser::node& color = input.emplace("");
   color.emplace("11");
-  color.emplace((param) ? "lascra" : code.value);
+  color.emplace(param ? "lascra" : (code.size() == 0 ? code.value : macro_parameter(code[0].value).value));
   // Return parameter
 	return input;
 }
 
 bparser::node& parameter_color(bparser::node& sprite, bparser::node& code, std::string parentid) {
-	bool param = (code.size() == 0) ? false : true;
+	bool param = (code.size() == 0 || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)) ? false : true;
 	bparser::node& input = *(new bparser::node(""));
 	input.emplace(((param) ? "3" : "1"));
 	if (param) {
@@ -668,7 +724,7 @@ bparser::node& parameter_color(bparser::node& sprite, bparser::node& code, std::
   //Input validaton
   if (!param) {
     std::istringstream hex;
-    hex.str(code.value);
+    hex.str(code.size() == 0 ? code.value : macro_parameter(code[0].value).value);
     int n = 0;
     char c;
     while (hex.get(c)) {
@@ -702,7 +758,7 @@ bparser::node& parameter_color(bparser::node& sprite, bparser::node& code, std::
   // Add color
   bparser::node& color = input.emplace("");
   color.emplace("9");
-  color.emplace((param) ? "#000000" : code.value);
+  color.emplace((param) ? "#000000" : (code.size() == 0 ? code.value : macro_parameter(code[0].value).value));
   // Return parameter
 	return input;
 }
@@ -712,7 +768,7 @@ bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std:
 }
 
 bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std::string parentid, std::string name, std::string opcode, std::string field, std::map<std::string,std::string> values, bool acceptAll, bool noNull) {
-	bool param = (code.size() == 0) ? false : true;
+	bool param = (code.size() == 0 || (code.value == "parameter" && code.size() == 1 && code[0].size() == 0 && macro_parameter(code[0].value).size() == 0)) ? false : true;
 	bparser::node& input = *(new bparser::node(field));
 	input.emplace(((param) ? "3" : "1"));
 	if (param) {
@@ -727,8 +783,8 @@ bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std:
 	else {
 		bparser::node& shadow = block(id::get(name), opcode, false, true);
 		parent(shadow, parentid);
-		if (acceptAll) shadow.find("fields").push(&field_parameter(code, noNull)).value = field;
-	  else shadow.find("fields").push(&field_parameter(code, values, param, noNull)).value = field;
+		if (acceptAll) shadow.find("fields").push(&field_parameter(code.size() == 0 ? code : macro_parameter(code[0].value), noNull)).value = field;
+	  else shadow.find("fields").push(&field_parameter(code.size() == 0 ? code : macro_parameter(code[0].value).value, values, param, noNull)).value = field;
 		sprite.find("blocks").push(&shadow);
 		input.emplace(shadow.value);
 	}
