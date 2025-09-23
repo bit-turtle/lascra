@@ -29,10 +29,6 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}\build --config ${{env.BUILD_TYPE}}
 
-    - name: Bundle
-      # Create directory to hold resulting files
-      run: mkdir ${{github.workspace}}\bundle && Copy-Item -Recurse -Path ${{github.workspace}}\build\release\Asteroidal.exe, ${{github.workspace}}\build\release\openal32.dll, .\highscore.txt, .\assets, .\sounds, .\textures -Destination ${{github.workspace}}\bundle
-
     - name: Upload Lascra
       uses: actions/upload-artifact@v4.6.2
       with:
