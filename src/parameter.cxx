@@ -784,7 +784,7 @@ bparser::node& shadow_parameter(bparser::node& sprite, bparser::node& code, std:
 		bparser::node& shadow = block(id::get(name), opcode, false, true);
 		parent(shadow, parentid);
 		if (acceptAll) shadow.find("fields").push(&field_parameter(code.size() == 0 ? code : macro_parameter(code[0].value), noNull)).value = field;
-	  else shadow.find("fields").push(&field_parameter(code.size() == 0 ? code : macro_parameter(code[0].value).value, values, param, noNull)).value = field;
+	  else shadow.find("fields").push(&field_parameter(code.size() == 0 ? code : macro_parameter(code[0].value), values, param, noNull)).value = field;
 		sprite.find("blocks").push(&shadow);
 		input.emplace(shadow.value);
 	}
