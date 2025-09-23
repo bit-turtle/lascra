@@ -11,6 +11,7 @@ The parameter statement in `say` is `join`, which takes in two parameter stateme
 * Shadow (Round dropdowns)
   - Special String (Usually)
   - Generic Parameter
+  - Macro Parameter
   - Example:
     - `(goto _mouse_)`
     - `(goto (variable thing) )`
@@ -20,12 +21,14 @@ The parameter statement in `say` is `join`, which takes in two parameter stateme
   - Integer
   - Positive Integer
   - Generic Parameter
+  - Macro Parameter
   - Example:
     - `(change variable 5)`
     - `(change variable (value answer) )`
 * String
   - String
   - Generic Parameter
+  - Macro Parameter
   - Example:
     - `(say "Hi!")`
     - `(say (join "Hello, " (value username) ) )`
@@ -33,6 +36,10 @@ The parameter statement in `say` is `join`, which takes in two parameter stateme
   - Boolean parameters are always boolean blocks.
   - Example:
     - `(if (= (+ 2 2) 4) (say "2+2=4") )`
+## Macro Parameter
+* (parameter *parameterName*)
+  - Can only be used inside of a macro
+  - [Macro Documentation](TOP.md#macro-statements)
 ## Boolean Parameters
 * (and *boolean* *boolean*)
 * (or *boolean* *boolean*)
@@ -51,6 +58,8 @@ The parameter statement in `say` is `join`, which takes in two parameter stateme
     - Go Direct Force and Acceleration falling block
 ## Generic Parameters
 Generic parameters are blocks passed as values instead of inputing the value directly. List of generic parameters
+* (argument *argumentName*)
+  - Can only be used inside of a function/procedure
 * (bool *boolean*)
 * (variable *variableName*)
 * (list *listName*)

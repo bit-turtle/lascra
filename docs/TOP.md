@@ -1,10 +1,11 @@
 # Top Level Statements
-There are 5 different top level statements
+There are 6 different top level statements
 1. `declare` properties for the sprite
 2. `define` variables, lists, and broadcasts for the sprite
 3. Run code `when` an event happens
 4. Define a `procedure`
 5. Define a `function` which runs without screen refresh
+6. Declare a `macro` which can be used as a parameter
 ## Declare Statements
 `(declare (property value)... )`
 ### Declare Properties
@@ -96,5 +97,15 @@ Either text or arguments can be entered into the arguments section, argument typ
     (if (argument condition)
         (say (argument message) )
     )
+)
+```
+## Macro Statements
+Macros declare a block of code that returns a value and can take parameters. Macros can be used as parameters to any block.
+### Macro Structure
+`(macro (name parameters...) code)`
+### Example Macro
+```
+(macro (hello name)
+    (join "Hello, " (parameter name) )
 )
 ```
