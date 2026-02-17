@@ -1,129 +1,65 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Lascra</title>
+		<title>Lascra Web Compiler</title>
 		<style>
-			#log {
-				font-family: monospace;
+			html, body {
+				background-color: #e6f0ff;
 			}
-			h1 {
-				margin-bottom: 0;
+			.scratchblocks {
+				background-color: #f9f9f9;
+				border: 1px solid #c3ccd9;
+				border-radius: 15px;
+				padding: 15px;
+				display: inline-block;
 			}
-			html,
-			body {
-				background-color: #fbed3b;
+			.scratchbubble {
+				border: 50px solid transparent;
+				border-image: url(data:image/png;base64,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) 50 stretch;
+				display: inline-block;
+				padding: 0;
 			}
-			input {
-				font-family: monospace;
-				font-weight: bold;
-			}
-			main {
-				font-family: monospace;
-				background-color: #8e20ff;
-				border: 5px solid black;
-				border-radius: 100px;
-				padding: 10px;
-				text-align: center;
-				color: white;
-				font-weight: bold;
-			}
-			#logger {
-				margin-top: 20px;
-				margin-bottom: 10px;
-				background-color: black;
-				color: white;
-				border: 5px solid lightgray;
-				width: 60%;
-				padding: 5px;
-				margin-left: calc(20% - 10px);
-				text-align: left;
-				white-space: pre-wrap;
-				word-wrap: break-word;
-			}
-			#examples {
-				margin-top: 15px;
-				font-family: monospace;
-				background-color: #ff7425;
-				border: 5px solid black;
-				border-radius: 100px;
-				padding: 10px;
-				text-align: center;
-				color: white;
-				font-weight: bold;
-			}
-			.example {
-				margin-top: 20px;
-				margin-bottom: 10px;
-				background-color: black;
-				color: white;
-				border: 5px solid lightgray;
-				width: 60%;
-				padding: 5px;
-				margin-left: calc(20% - 10px);
-				text-align: left;
-				white-space: pre-wrap;
-				word-wrap: break-word;
-			}
-			#compiler {
-				background-color: #fc6668;
-				font-weight: bold;
-				border-radius: 100px;
-				border: 5px solid black;
-				padding: 5px;
-				width: 40%;
-				margin-left: calc(30% - 20px);
-			}
-			#download {
-				border: 3px solid black;
-				max-width: 8em;
-				margin-top: 15px;
-				border-radius: 20px;
-				margin-left: calc(50% - 4em - 6px);
-				background-color: #31bef7;
-				color: white;
-				text-decoration: none;
-			}
-			#github {
-				color: white;
-				padding-bottom: 10px;
-			}
-			button {
-				cursor: pointer;
-				border-radius: 20px;
-				border: 3px solid black;
-				background: #f5af3d;
-				color: white;
-				font-weight: bold;
-				font-family: monospace;
-			}
-			#help {
-				background-color: #42ce9d;
-			}
-			#selection {
-				background-color: #0073ff;
-				color: white;
-				font-weight: bold;
-				border-radius: 100px;
-				border: 5px solid black;
-				padding: 10px;
-				width: 80%;
-				margin-left: calc(10% - 20px);
-			}
-			input {
-				color: white;
-			}
-			input[type="text"] {
-				color: black;
-				font-weight: normal;
+			.scratchbubble * {
+				background-color: #ffffff;
 			}
 		</style>
 	</head>
 	<body>
-		<main>
-			<h1>Lascra Compiler</h1>
-			<a id="github" href="https://github.com/bit-turtle/lascra">GitHub Repository</a>
-			<br />
-			<p></p>
+		<h1>Lascra Web Compiler</h1>
+		<a id="github" href="https://github.com/bit-turtle/lascra">GitHub Repository</a> <br />
+			 <a href="https://github.com/bit-turtle/lascra/tree/main/examples"> Lascra Code Examples</a> <br />
+			 <a href="https://github.com/bit-turtle/lascra/blob/main/docs/STRUCTURE.md"> Lascra Documentation</a>
+		<br />
+		<p>Interact with the Scratch blocks below to compile Lascra code into Scratch sprites</p>
+		<noscript>Sorry, there is just no way to run this without JavaScript and WebAssembly being supported and enabled</noscript>
+		<pre class="blocks" style="display: none">
+			when flag clicked
+			say [Welcome to Lascra!]
+			set (file) to (Upload Sprite or Project File v)
+			set (sprite) to (Uploaded Sprite v)
+			set (sources) to (Upload Source Files v)
+			compile (sources) into (sprite) of (file) :: custom
+			show list (Generated Code v)
+			show variable (Output JSON v)
+			download (file) :: custom
+		</pre>
+		<div id="logger">
+			<table>
+				<tr>
+					<td></td>
+					<td class="scratchbubble">
+						<div id="log">Welcome to Lascra!</div>
+					</td>
+				</tr>
+				<tr>
+						<td>
+							<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iOTUuMTc4OTgxMDE4MDY2NDEiIGhlaWdodD0iMTAwLjA0MTU2MDM2Mzc2OTUzIiB2aWV3Qm94PSIwLjMyMTAxNzE2OTk1MjM5MjYgMC4zMDAwMDAwMzU3NjI3ODY5IDk1LjE3ODk4MTAxODA2NjQxIDEwMC4wNDE1NjAzNjM3Njk1MyIgdmVyc2lvbj0iMS4xIiB4bWw6c3BhY2U9InByZXNlcnZlIj4KICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDUyLjUgKDY3NDY5KSAtIGh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaCAtLT4KICA8Zz4KICAgIDx0aXRsZT5jb3N0dW1lMS4xPC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICA8ZyBpZD0iY29zdHVtZTEiPgogICAgICAgIDxnIGlkPSJjb3N0dW1lMS4xIj4KICAgICAgICAgIDxnIGlkPSJ0YWlsIj4KICAgICAgICAgICAgPHBhdGggZD0iTSAyMS45IDczLjggQyAxOS41IDczLjMgMTYuNiA3Mi41IDE0LjIgNzAuMyBDIDguNyA2NS40IDcgNTcuMyAzLjIgNTkuNCBDIC0wLjcgNjEuNSAtMC42IDc0LjYgMTEuNiA3OC42IEMgMTUuOCA4MCAxOS42IDgwIDIyLjcgNzkuOSBDIDIzLjUgNzkuOSAzMC40IDc5LjIgMzIuOCA3NS44IEMgMzUuMiA3Mi40IDMzLjUgNzEuNSAzMi43IDcxLjEgQyAzMS44IDcwLjYgMjUuMyA3NC40IDIxLjkgNzMuOCBaICIgc3Ryb2tlPSIjMDAxMDI2IiBzdHJva2Utd2lkdGg9IjEuMiIgZmlsbD0iI0ZGQUIxOSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0gMy44IDU5LjYgQyAxLjggNjAuMiAwLjggNjQuNCAxLjggNjcuOSBDIDIuOCA3MS40IDQuNCA3My4yIDUuNyA3NC41IEMgNS41IDczLjggNS4xIDcxLjYgNi44IDcwLjMgQyA4LjkgNjguNiAxMi42IDY5LjUgMTIuNiA2OS41IEMgMTIuNiA2OS41IDkuNSA2NS43IDcuOSA2MyBDIDYuMyA2MC43IDUuOCA1OS4yIDMuOCA1OS42IFogIiBpZD0iZGV0YWlsIiBmaWxsPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjEiLz4KICAgICAgICAgIDwvZz4KICAgICAgICAgIDxwYXRoIGQ9Ik0zNy43LDgxLjUgQzM1LjksODIuNyAyOS43LDg3LjEgMjEuOCw4OS42IEwyMS40LDg5LjcgQzIxLDg5LjggMjAuOCw5MC4zIDIxLDkwLjcgQzIyLjcsOTMuMSAyNS44LDk3LjkgMjAuMyw5OS42IEMxNSwxMDEuMyA1LjEsODcuMiA5LjMsODMuNSBDMTEuMiw4Mi4xIDEyLjksODIuOCAxMy44LDgzLjIgQzE0LjMsODMuNCAxNC44LDgzLjQgMTUuMyw4My4zIEMxNi41LDgyLjkgMTguNyw4Mi4xIDIwLjQsODEuMiBDMjQuNyw3OSAyNS43LDc4LjEgMjcuNyw3Ni42IEMyOS43LDc1LjEgMzQuMyw3MS40IDM4LDc0LjYgQzQxLjIsNzcuMyAzOS40LDgwLjMgMzcuNyw4MS41IFoiIGlkPSJsZWciIHN0cm9rZT0iIzAwMTAyNiIgc3Ryb2tlLXdpZHRoPSIxLjIiIGZpbGw9IiNGRkFCMTkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogICAgICAgICAgPHBhdGggZD0iTTUzLjYsNjAuNyBDNTQuMSw2MS4xIDYwLjIsNjguMyA2Mi4yLDY2LjUgQzY0LjYsNjQuNCA2Ny45LDYwLjMgNzEuNSw2My42IEM3NS4xLDY2LjkgNjguMyw3Mi41IDY1LjQsNzQgQzU4LjUsNzcuMSA1Mi45LDcxLjIgNTEuNyw2OS42IEM1MC41LDY4IDQ4LjQsNjUuMyA0OC40LDYyLjcgQzQ4LjUsNTkuOSA1MS45LDU5LjIgNTMuNiw2MC43IFoiIGlkPSJhcm0iIHN0cm9rZT0iIzAwMTAyNiIgc3Ryb2tlLXdpZHRoPSIxLjIiIGZpbGw9IiNGRkFCMTkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogICAgICAgICAgPGcgaWQ9ImJvZHktYW5kLWxlZyI+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0gNDYuMiA3Ni43IEMgNDcuNCA3NS44IDQ4LjYgNzQuMyA1MC4yIDcyIEMgNTEuNSA3MC4xIDUyLjkgNjYuNCA1Mi45IDY2LjQgQyA1My44IDYzLjkgNTQuNCA1OS4xIDUxLjEgNTkuMiBDIDQ4LjkgNTkuMyA0Ni45IDU5IDQzLjUgNTguNSBDIDM3LjUgNTcuMyAzNi40IDU2LjUgMzMuOSA2MC42IEMgMzEuMiA2NS40IDI0LjMgNjguOSAzMi44IDc3LjIgQyAzMi44IDc3LjIgMzcuNyA4MSA0My42IDg2LjggQyA0Ny42IDkwLjcgNTMuOSA5Ni4zIDU2LjEgOTguMiBDIDU2LjYgOTguNiA1Ny4yIDk4LjggNTcuOCA5OC45IEMgNjcuNSA5OS44IDc0LjcgOTguOCA3NC43IDk0LjUgQyA3NC43IDg3LjMgNjAuNCA4OS44IDYwLjQgODkuOCBDIDYwLjQgODkuOCA1NS44IDg1LjkgNTMuNyA4NCBMIDQ2LjIgNzYuNyBaICIgaWQ9ImJvZHkiIHN0cm9rZT0iIzAwMTAyNiIgc3Ryb2tlLXdpZHRoPSIxLjIiIGZpbGw9IiNGRkFCMTkiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogICAgICAgICAgICA8cGF0aCBkPSJNIDUwLjYgNzAgQyA1MC42IDcwIDUyLjUgNjcuNSA0OC4yIDY0LjggQyA0My43IDYxLjkgNDIgNjUuMSA0MC4yIDY3LjUgQyAzOC4yIDcwLjYgNDAuMiA3Mi4xIDQyLjIgNzMuOSBDIDQzLjggNzUuNCA0NS4zIDc2LjYgNDUuMyA3Ni42IEMgNDUuMyA3Ni42IDQ4LjQgNzQuNSA1MC42IDcwIFogIiBpZD0idHVtbXkiIGZpbGw9IiNGRkZGRkYiIHN0cm9rZS13aWR0aD0iMSIvPgogICAgICAgICAgPC9nPgogICAgICAgICAgPHBhdGggZD0iTTMwLjIsNjguNCBDMzIuNCw3MS4yIDM1LjgsNzQuNyAzMS41LDc3LjYgQzI1LjYsODAuOSAyMC43LDcwLjkgMTkuNyw2Ny40IEMxOC44LDY0LjMgMjEuNCw2Mi4zIDIzLjYsNjAuNiBDMjcuOSw1Ny41IDMxLjUsNTQuNyAzNS41LDU2LjIgQzQwLjUsNTggMzYuOSw2MiAzNC40LDYzLjggQzMyLjksNjQuOSAzMS40LDY2LjEgMzAuMyw2Ni44IEMzMCw2Ny4zIDI5LjksNjcuOSAzMC4yLDY4LjQgWiIgaWQ9ImFybSIgc3Ryb2tlPSIjMDAxMDI2IiBzdHJva2Utd2lkdGg9IjEuMiIgZmlsbD0iI0ZGQUIxOSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgICAgICAgICA8ZyBpZD0iaGVhZCI+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0gNTMuMSA5IEMgNTAuOCA4LjYgNDguNCA4LjQgNDUuNiA4LjYgQyA0MC45IDguOCAzNi40IDEwLjUgMzYuNCAxMC41IEwgMjQuMyAyLjYgQyAyMy45IDIuNCAyMy40IDIuNyAyMy41IDMuMSBMIDI1LjYgMjEgQyAyNi4yIDIwLjIgMTUgMzMuOCAyMi4xIDQ1LjIgQyAyOS4yIDU2LjYgNDQuMyA2MS43IDYzLjEgNTggQyA4MS45IDU0LjMgODYuMyA0My41IDg1LjEgMzcuOCBDIDgzLjkgMzIuMSA3Ni44IDMwIDc2LjggMzAgQyA3Ni44IDMwIDc2LjcgMjUuNSA3My41IDIwIEMgNzEuNiAxNi43IDY1LjIgMTIgNjUuMiAxMiBMIDYyLjYgMS4zIEMgNjIuNSAwLjkgNjIgMC44IDYxLjcgMSBMIDUzLjEgOSBaICIgc3Ryb2tlPSIjMDAxMDI2IiBzdHJva2Utd2lkdGg9IjEuMiIgZmlsbD0iI0ZGQUIxOSIvPgogICAgICAgICAgICA8cGF0aCBkPSJNIDc2LjUgMzAuNCBDIDc2LjUgMzAuNCA4My40IDMyLjIgODQuNiAzNy45IEMgODUuOCA0My42IDgxIDUzLjkgNjIuNCA1Ny41IEMgMzguMiA2Mi41IDI2LjcgNDguMSAzMy40IDM3LjUgQyA0MC4xIDI2LjggNTEuNiAzNS45IDYwIDM1LjMgQyA2Ny4yIDM0LjggNjggMjguNSA3Ni41IDMwLjQgWiAiIGlkPSJmYWNlIiBmaWxsPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjEiLz4KICAgICAgICAgICAgPHBhdGggZD0iTSA0NSA0MS4xIEMgNDUgNDAuNyA0NS40IDQwLjQgNDUuOCA0MC41IEMgNDcuNyA0MS4yIDUzLjEgNDIuOCA1OS4xIDQzLjIgQyA2NC41IDQzLjUgNjcuNyA0My4yIDY5LjIgNDIuOSBDIDY5LjcgNDIuOCA3MC4xIDQzLjMgNjkuOSA0My44IEMgNjkgNDYuNSA2NS4yIDU0IDU0LjcgNTMuNCBDIDQ1LjYgNTIuNCA0NC43IDQ2IDQ1IDQxLjEgWiAiIGlkPSJtb3V0aCIgc3Ryb2tlPSIjMDAxMDI2IiBzdHJva2Utd2lkdGg9IjEuMiIgZmlsbD0iI0ZGRkZGRiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0gODMgMzUuNCBDIDgzIDM1LjQgOTAuMiAzNS4zIDk0LjkgMzEuNSAiIGlkPSJ3aGlza2VyIiBzdHJva2U9IiMwMDEwMjYiIHN0cm9rZS13aWR0aD0iMS4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiLz4KICAgICAgICAgICAgPHBhdGggZD0iTSA4My40IDQxLjMgQyA4My40IDQxLjMgODcuMyA0My4yIDkzLjYgNDIuNyAiIGlkPSJ3aGlza2VyIiBzdHJva2U9IiMwMDEwMjYiIHN0cm9rZS13aWR0aD0iMS4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiLz4KICAgICAgICAgICAgPHBhdGggZD0iTSA1OS42IDMyLjcgQyA2MS43IDMyLjcgNjMuOSAzMi45IDY0IDMzLjYgQyA2NC4xIDM1IDYyLjYgMzcuOCA2MSAzNy45IEMgNTkuMiAzOC4xIDU1IDM1LjYgNTUgMzQgQyA1NC45IDMyLjggNTcuNiAzMi43IDU5LjYgMzIuNyBaICIgaWQ9Im5vc2UiIHN0cm9rZT0iIzAwMTAyNiIgc3Ryb2tlLXdpZHRoPSIxLjIiIGZpbGw9IiMwMDEwMjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogICAgICAgICAgICA8cGF0aCBkPSJNIDE0LjYgMzEuMiBDIDE0LjYgMzEuMiAyMy4yIDM0IDI2LjcgMzcuMSAiIGlkPSJ3aGlza2VyIiBzdHJva2U9IiMwMDEwMjYiIHN0cm9rZS13aWR0aD0iMS4yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiLz4KICAgICAgICAgICAgPHBhdGggZD0iTSAxNS4zIDQxLjIgQyAxNS4zIDQxLjIgMjIuNyA0Mi4zIDI3IDQwLjYgIiBpZD0id2hpc2tlciIgc3Ryb2tlPSIjMDAxMDI2IiBzdHJva2Utd2lkdGg9IjEuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBmaWxsPSJub25lIi8+CiAgICAgICAgICAgIDxnIGlkPSJleWUiPgogICAgICAgICAgICAgIDxwYXRoIGQ9Ik0gNzEuNCAyMSBDIDc0LjMgMjUuNSA3NC40IDMwLjYgNzEuNiAzMi40IEMgNjguOCAzNC4yIDY0LjIgMzIuMSA2MS4yIDI3LjYgQyA1OC4zIDIzLjEgNTguMiAxOCA2MSAxNi4yIEMgNjMuOCAxNC4zIDY4LjUgMTYuNSA3MS40IDIxIFogIiBpZD0icHVwaWwiIHN0cm9rZT0iIzAwMTAyNiIgc3Ryb2tlLXdpZHRoPSIxLjIiIGZpbGw9IiNGRkZGRkYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogICAgICAgICAgICAgIDxwYXRoIGQ9Ik0gNzEgMjYuNyBDIDcxIDI3LjggNzAuMiAyOC43IDY5LjIgMjguNyBDIDY4LjIgMjguNyA2Ny40IDI3LjggNjcuNCAyNi43IEMgNjcuNCAyNS42IDY4LjIgMjQuNyA2OS4yIDI0LjcgQyA3MC4yIDI0LjcgNzEgMjUuNiA3MSAyNi43ICIgaWQ9InB1cGlsIiBmaWxsPSIjMDAxMDI2IiBzdHJva2Utd2lkdGg9IjEiLz4KICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8ZyBpZD0iZXllIj4KICAgICAgICAgICAgICA8cGF0aCBkPSJNIDQ2LjYgMjMuOCBDIDQ5LjYgMjguMiA0OS40IDMzLjYgNDYuNyAzNS41IEMgNDMuNCAzNy40IDM5IDM2IDM2IDMxLjYgQyAzMi45IDI3LjIgMzIuNyAyMS41IDM1LjggMTkuMyBDIDM4LjkgMTcgNDMuNiAxOS40IDQ2LjYgMjMuOCBaICIgc3Ryb2tlPSIjMDAxMDI2IiBzdHJva2Utd2lkdGg9IjEuMiIgZmlsbD0iI0ZGRkZGRiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgICAgICAgICAgICAgPHBhdGggZD0iTSA0NiAyOS42IEMgNDYgMzAuNyA0NS4yIDMxLjYgNDQuMiAzMS42IEMgNDMuMiAzMS42IDQyLjQgMzAuNyA0Mi40IDI5LjYgQyA0Mi40IDI4LjUgNDMuMiAyNy42IDQ0LjIgMjcuNiBDIDQ1LjIgMjcuNyA0NiAyOC41IDQ2IDI5LjYgIiBpZD0icHVwaWwiIGZpbGw9IiMwMDEwMjYiIHN0cm9rZS13aWR0aD0iMSIvPgogICAgICAgICAgICA8L2c+CiAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgICA8L2c+CiAgICA8L2c+CiAgPC9nPgo8L3N2Zz4=" alt="Scratch Cat" />
+						</td>
+						<td></td>
+				</tr>
+			</table>
+		</div>
+		<main style="display: none">
 			<div id="selection">
 				<label for="sprite">Sprite File:</label>
 				<input type="file" id="sprite" />
@@ -153,146 +89,136 @@
 			<span id="result">Try Compiling!</span>
 			<br />
 			<a id="download" style="display: none;">Download!</a>
-						<div id="logger"><span id="log">Welcome to Lascra!</span></div>
+						
 			<button type="button" id="help">Display Help Message</button>
+			<p>
+			If you see this, the scratchblocks library failed to load.
+			It probably looks really bad, but it should still be usable.
+			</p>
 			<br />
 		</main>
-		<div id="examples">
-			<h2>
-				Code File Examples
-			</h2>
-			<div class="example">(declare
-	(name "Hello World!")
-)
-(when flag
-	(say "Hello World!")
-)</div>
-			<div class="example">(declare
-	(name "if, elif, and else")
-)
-(when flag
-	(ask "Enter a number")
-	(if (= (value answer) 42)
-		(say "42 is the answer")
-	)
-	(elif (&gt (value answer) 100)
-		(say "That number is greater than 100")
-	)
-	(elif (&lt (value answer) 0)
-		(say "That number is less than 0")
-	)
-	(else
-		(say "That number is something else")
-	)
-)</div>
-			<div class="example">(declare
-	(name "Events")
-)
-(define
-	(broadcast MyBroadcast)
-)
-(when flag
-	(say "Green Flag")
-	(clone _myself_)
-	(broadcast MyBroadcast)
-)
-(when clicked
-	(say "Sprite Clicked")
-)
-(when (pressed space)
-	(say "Space Key Pressed")
-)
-(when (received MyBroadcast)
-	(say "Received the broadcast")
-)
-(when clone
-	(say "I'm a clone!")
-	(goto _random_)
-)</div>
-			<div class="example">(declare
-	(name "Motion")
-)
-(when flag
-	(goto_xy 0 0)
-	(point_direction 45)
-	(move 20)
-	(change_x -50)
-	(glide_xy 5 0 0)
-	(forever
-		(glide 2 _mouse_)
-	)
-)
-</div>
-			<div class="example">(declare
-	(name "Data")
-)
-(define
-	(variable counter 0)
-	(list things
-		thing1
-		thing2
-		thing3
-		thing4
-		thing5
-	)
-)
-(when flag
-	(set counter 0)
-	(repeat_until (not (&lt (variable counter) (size things) ) )
-		(change counter 1)
-		(say (join
-			(join "Thing " (variable counter) )
-			(join "in things = " (item (variable counter) things) )
-		) )
-	)
-	(wait 5)
-	(insert "thing" 3 things)
-	(add "addition" things)
-	(delete 4 things)
-	(replace 5 things "replacement")
-)</div>
-      <div class="example">(declare
-  (name "Functions and Procedures")
-)
-(function say_if (Say (string message) if (boolean condition) )
-  (if (argument condition)
-    (say (argument message) )
-  )
-)
-(define (variable counter) )
-(procedure countdown (Countdown from (number start) )
-  (set counter (argument start) )
-  (repeat_until (= 0 (variable counter) )
-    (say_for (variable counter) 1)
-    (change counter -1)
-  )
-)
-(when flag
-  (call countdown 5)
-  (say_for "Press to see the message" 2)
-  (forever
-    (call say_if "Generated with Lascra!" (mouse_down) )
-  )
-)</div>
-      <div class="example">(declare
-  (name "Pen")
-)
-(when flag
-  (hide)
-  (pen_clear)
-  (pen_color #000000)
-  (pen_set size 10)
-  (pen_set transparency 0)
-  (# Draw Square)
-  (pen_down)
-  (repeat 4
-    (move 50)
-    (turn_right 90)
-    (pen_change transparency 15)
-  )
-  (pen_up)
-)</div>
-		</div>
+		<!-- Import ScratchBlocks -->
+		<script src="scratchblocks.min.js"></script>
+		<script>
+			if (typeof scratchblocks !== "undefined") {
+				scratchblocks.renderMatching('.blocks', {
+					style:     'scratch3',
+					languages: ['en'],
+					scale: 1,
+				});
+				// File uploads
+				let entries = document.querySelectorAll(".sb3-variables.sb3-input");
+				for (let i = 0; i < entries.length; i++) {
+					let group = entries[i].parentNode;
+					switch (i) {
+						case 0:
+							// Sprite Upload
+							group.addEventListener("click", function() {
+								document.querySelector("#sprite").click();
+							});
+							group.style.cursor = "pointer";
+							document.querySelector("#sprite").addEventListener('change', function() {
+								if (document.querySelector("#sprite").files.length == 0)
+									group.querySelector(".sb3-label").textContent = "Upload Sprite or Project File";
+								else
+									group.querySelector(".sb3-label").textContent = document.querySelector("#sprite").files[0].name;
+							});
+							break;
+						case 1:
+							// SB3 Mode
+							group.addEventListener("click", function() {
+								let sprite_name = window.prompt("Enter sprite name in project\nLeave blank to process as a sprite file");
+								if (sprite_name == null || sprite_name == "") {
+									// SB3 mode off
+									document.querySelector("#sb3").checked = false;
+									group.querySelector(".sb3-label").textContent = "Uploaded Sprite";
+								}
+								else {
+									// SB3 mode on
+									document.querySelector("#sb3").checked = true;
+									document.querySelector("#name").value = sprite_name;
+									group.querySelector(".sb3-label").textContent = sprite_name;
+								}
+							});
+							group.style.cursor = "pointer";
+							break;
+						case 2:
+							// Source Upload
+							group.addEventListener("click", function() {
+								document.querySelector("#code").click();
+							});
+							group.style.cursor = "pointer";
+							document.querySelector("#code").addEventListener('change', function() {
+								if (document.querySelector("#code").files.length == 0)
+									group.querySelector(".sb3-label").textContent = "Upload Source Files";
+								else if (document.querySelector("#code").files.length == 1)
+									group.querySelector(".sb3-label").textContent = document.querySelector("#code").files[0].name;
+								else
+									group.querySelector(".sb3-label").textContent = document.querySelector("#code").files.length.toString() + " Source Files";
+							});
+							break;
+					}
+					// Toggleable / Runnable blocks
+					let blocks = document.querySelectorAll("svg > g > g > g");
+					for (let i = 0; i < blocks.length; i++) {
+						let block = blocks[i];
+						switch (i) {
+							case 0:
+								// Flag
+								block.addEventListener("click", function(event) {
+									document.querySelector("#compile").click();
+									event.stopImmediatePropagation();
+								});
+								block.style.cursor = "pointer";
+								break;
+							case 6:
+								// Generated Code
+								block.addEventListener("click", function(event) {
+									document.querySelector("#list").click();
+									event.stopImmediatePropagation();
+								});
+								block.querySelector(".sb3-label").textContent = "hide";
+								document.querySelector("#list").addEventListener("change", function() {
+									if (document.querySelector("#list").checked)
+										block.querySelector(".sb3-label").textContent = "show";
+									else
+										block.querySelector(".sb3-label").textContent = "hide";
+								});
+								block.style.cursor = "pointer";
+								break;
+							case 7:
+								// Output JSON
+								block.addEventListener("click", function(event) {
+									document.querySelector("#display").click();
+									event.stopImmediatePropagation();
+								});
+								block.querySelector(".sb3-label").textContent = "hide";
+								document.querySelector("#display").addEventListener("change", function() {
+									if (document.querySelector("#display").checked)
+										block.querySelector(".sb3-label").textContent = "show";
+									else
+										block.querySelector(".sb3-label").textContent = "hide";
+								});
+								block.style.cursor = "pointer";
+								break;
+						}
+					}
+				}
+				// Show scratchblocks
+				document.querySelector(".blocks").style.display = "block";
+				// Hide main
+				document.querySelector("main").style.display = "none";
+			}
+			else {
+				// Delete scratchblocks if library failed to load
+				document.querySelector(".blocks").remove();
+				// Show main
+				document.querySelector("main").style.display = "block";
+			}
+			document.querySelector("#sb3").checked = false;
+			document.querySelector("#display").checked = false;
+			document.querySelector("#list").checked = false;
+		</script>
 		<script>
 			// Override console.log
 			(function () {
@@ -300,17 +226,31 @@
 				var logger = document.getElementById("log");
 				console.log = function () {
 					for (var i = 0; i < arguments.length; i++) {
+						let text;
 						if (typeof arguments[i] == "object") {
-							logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(arguments[i], undefined, 2) : arguments[i]) + "<br />";
+							text = (JSON && JSON.stringify ? JSON.stringify(arguments[i], undefined, 2) : arguments[i]);
 						} else {
-							logger.innerHTML += arguments[i] + "<br />";
+							text = arguments[i];
 						}
+						logger.innerHTML += text + " <br>";
 					}
 				};
 			})();
 		</script>
 		<!-- Import Lascra WebAssembly Module -->
+		<script>
+			var Module = {
+				onAbort: function(error) {
+					document.querySelector("#logger").textContent = "Failed to load WebAssembly Module, absolutely nothing will work :(";
+				}
+			};
+		</script>
 		<script src="lascra.js"></script>
+		<script>
+			if (typeof Module === "undefined") {
+				document.querySelector("#logger").textContent = "Failed to load Emscripten JavaScript Module, absolutely nothing will work :(";
+			}
+		</script>
 		<script>
 			// Lascra Javascript
 			const sprite = document.getElementById("sprite");
@@ -336,7 +276,14 @@
 				reader.readAsArrayBuffer(event.target.files[0]);
 			});
 			// Compile Sprite
+			let lock = false;
 			async function lascra(event) {
+				// Locked
+				if (lock)
+					return;
+				lock = true;
+				// Clear Log
+				document.getElementById("log").innerHTML = "";
 				// Hide download link
 				download.style = "display: none";
 				if (download.href) URL.revokeObjectURL(download.href);
@@ -356,8 +303,6 @@
 					args.push(code.files[file].name);
 					// std::ifstream text mode does not work correctly with emscripten
 				}
-				// Clear Log
-				document.getElementById("log").innerHTML = "";
 				// Compile Sprite
 				let ret = Module.callMain(args);
 				// Update Page
@@ -367,7 +312,10 @@
 					var url = URL.createObjectURL(new Blob([FS.readFile("sprite").buffer], { type: "application/octet-stream" }));
 					download.href = url;
 					download.style = "display: block";
+					// Auto download
+					download.click();
 				} else result.textContent = "Error!";
+				lock = false;
 			}
 			compile.addEventListener("click", lascra);
 			// Help Message

@@ -15,7 +15,7 @@
 
 int main(int argc, char* argv[]) {
 	// Command line parser
-	argparse::ArgumentParser lascra("lascra", "0.5");
+	argparse::ArgumentParser lascra("lascra", "v1.5");
 
 	std::string sprite3filename;
 	lascra.add_argument("sprite")
